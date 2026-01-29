@@ -1,0 +1,56 @@
+/* reterm player styles */
+
+@keyframes reterm-blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0;
+  }
+}
+
+@keyframes reterm-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.reterm-player {
+  font-variant-ligatures: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.reterm-terminal {
+  box-sizing: border-box;
+}
+
+.reterm-line {
+  min-height: 1em;
+}
+
+.reterm-controls {
+  user-select: none;
+}
+
+.reterm-progress {
+  touch-action: none;
+}
+
+.reterm-play-button:hover {
+  transform: scale(1.05);
+}
+
+.reterm-play-button:active {
+  transform: scale(0.95);
+}
+
+.reterm-speed:focus {
+  outline: none;
+}
+
+/* Select dropdown styling */
+.reterm-speed option {
+  background: inherit;
+  color: inherit;
+}

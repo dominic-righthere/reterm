@@ -1,0 +1,282 @@
+{
+  "schema_version": "1.0.0",
+  "metadata": {
+    "tool_version": "0.1.0",
+    "script_file": "Interactive Prompt Test",
+    "started_at": "2026-01-14T23:23:48.504905",
+    "finished_at": "2026-01-14T23:23:51.092672",
+    "total_duration_ms": 2587,
+    "shell": "/bin/bash",
+    "terminal_size": [
+      80,
+      24
+    ],
+    "theme": "dracula",
+    "platform": "darwin",
+    "python_version": "3.12.11"
+  },
+  "commands": [
+    {
+      "id": "cmd_001",
+      "command": "echo \"Ready to continue? (y/n)\"",
+      "started_at": "2026-01-14T23:23:48.832263",
+      "finished_at": "2026-01-14T23:23:49.348481",
+      "duration_ms": 516,
+      "exit_code": 0,
+      "stdout": "Ready to continue? (y/n)",
+      "stderr": "",
+      "combined_output": "Ready to continue? (y/n)",
+      "working_directory": ".",
+      "terminal_before": {
+        "timestamp": "2026-01-14T23:23:48.832170",
+        "cursor_position": [
+          4,
+          10
+        ],
+        "screen_content": [
+          "",
+          "The default interactive shell is now zsh.",
+          "To update your account to use zsh, please run `chsh -s /bin/zsh`.",
+          "For more details, please visit https://support.apple.com/kb/HT208050.",
+          "bash-3.2$",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "screen_content_plain": "\nThe default interactive shell is now zsh.\nTo update your account to use zsh, please run `chsh -s /bin/zsh`.\nFor more details, please visit https://support.apple.com/kb/HT208050.\nbash-3.2$\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "dimensions": [
+          24,
+          80
+        ]
+      },
+      "terminal_after": {
+        "timestamp": "2026-01-14T23:23:49.348441",
+        "cursor_position": [
+          6,
+          10
+        ],
+        "screen_content": [
+          "",
+          "The default interactive shell is now zsh.",
+          "To update your account to use zsh, please run `chsh -s /bin/zsh`.",
+          "For more details, please visit https://support.apple.com/kb/HT208050.",
+          "bash-3.2$ echo \"Ready to continue? (y/n)\"",
+          "Ready to continue? (y/n)",
+          "bash-3.2$",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "screen_content_plain": "\nThe default interactive shell is now zsh.\nTo update your account to use zsh, please run `chsh -s /bin/zsh`.\nFor more details, please visit https://support.apple.com/kb/HT208050.\nbash-3.2$ echo \"Ready to continue? (y/n)\"\nReady to continue? (y/n)\nbash-3.2$\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "dimensions": [
+          24,
+          80
+        ]
+      }
+    },
+    {
+      "id": "cmd_002",
+      "command": "echo \"Done!\"",
+      "started_at": "2026-01-14T23:23:50.565411",
+      "finished_at": "2026-01-14T23:23:51.091973",
+      "duration_ms": 526,
+      "exit_code": 0,
+      "stdout": "bash: !\": event not found",
+      "stderr": "",
+      "combined_output": "bash: !\": event not found",
+      "working_directory": ".",
+      "terminal_before": {
+        "timestamp": "2026-01-14T23:23:50.565368",
+        "cursor_position": [
+          8,
+          10
+        ],
+        "screen_content": [
+          "",
+          "The default interactive shell is now zsh.",
+          "To update your account to use zsh, please run `chsh -s /bin/zsh`.",
+          "For more details, please visit https://support.apple.com/kb/HT208050.",
+          "bash-3.2$ echo \"Ready to continue? (y/n)\"",
+          "Ready to continue? (y/n)",
+          "bash-3.2$ y",
+          "bash: y: command not found",
+          "bash-3.2$",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "screen_content_plain": "\nThe default interactive shell is now zsh.\nTo update your account to use zsh, please run `chsh -s /bin/zsh`.\nFor more details, please visit https://support.apple.com/kb/HT208050.\nbash-3.2$ echo \"Ready to continue? (y/n)\"\nReady to continue? (y/n)\nbash-3.2$ y\nbash: y: command not found\nbash-3.2$\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "dimensions": [
+          24,
+          80
+        ]
+      },
+      "terminal_after": {
+        "timestamp": "2026-01-14T23:23:51.091926",
+        "cursor_position": [
+          10,
+          10
+        ],
+        "screen_content": [
+          "",
+          "The default interactive shell is now zsh.",
+          "To update your account to use zsh, please run `chsh -s /bin/zsh`.",
+          "For more details, please visit https://support.apple.com/kb/HT208050.",
+          "bash-3.2$ echo \"Ready to continue? (y/n)\"",
+          "Ready to continue? (y/n)",
+          "bash-3.2$ y",
+          "bash: y: command not found",
+          "bash-3.2$ echo \"Done!\"",
+          "bash: !\": event not found",
+          "bash-3.2$",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          ""
+        ],
+        "screen_content_plain": "\nThe default interactive shell is now zsh.\nTo update your account to use zsh, please run `chsh -s /bin/zsh`.\nFor more details, please visit https://support.apple.com/kb/HT208050.\nbash-3.2$ echo \"Ready to continue? (y/n)\"\nReady to continue? (y/n)\nbash-3.2$ y\nbash: y: command not found\nbash-3.2$ echo \"Done!\"\nbash: !\": event not found\nbash-3.2$\n\n\n\n\n\n\n\n\n\n\n\n\n",
+        "dimensions": [
+          24,
+          80
+        ]
+      }
+    }
+  ],
+  "steps": [
+    {
+      "type": "run",
+      "timestamp": "2026-01-14T23:23:49.348581",
+      "duration_ms": null,
+      "details": {
+        "hidden": false
+      }
+    },
+    {
+      "type": "wait_for",
+      "timestamp": "2026-01-14T23:23:49.452611",
+      "duration_ms": null,
+      "details": {
+        "hidden": false
+      }
+    },
+    {
+      "type": "type",
+      "timestamp": "2026-01-14T23:23:50.043616",
+      "duration_ms": null,
+      "details": {
+        "hidden": false
+      }
+    },
+    {
+      "type": "sleep",
+      "timestamp": "2026-01-14T23:23:50.564631",
+      "duration_ms": null,
+      "details": {
+        "hidden": false
+      }
+    },
+    {
+      "type": "run",
+      "timestamp": "2026-01-14T23:23:51.092010",
+      "duration_ms": null,
+      "details": {
+        "hidden": false
+      }
+    }
+  ],
+  "final_terminal_state": {
+    "timestamp": "2026-01-14T23:23:51.092660",
+    "cursor_position": [
+      10,
+      10
+    ],
+    "screen_content": [
+      "",
+      "The default interactive shell is now zsh.",
+      "To update your account to use zsh, please run `chsh -s /bin/zsh`.",
+      "For more details, please visit https://support.apple.com/kb/HT208050.",
+      "bash-3.2$ echo \"Ready to continue? (y/n)\"",
+      "Ready to continue? (y/n)",
+      "bash-3.2$ y",
+      "bash: y: command not found",
+      "bash-3.2$ echo \"Done!\"",
+      "bash: !\": event not found",
+      "bash-3.2$",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      ""
+    ],
+    "screen_content_plain": "\nThe default interactive shell is now zsh.\nTo update your account to use zsh, please run `chsh -s /bin/zsh`.\nFor more details, please visit https://support.apple.com/kb/HT208050.\nbash-3.2$ echo \"Ready to continue? (y/n)\"\nReady to continue? (y/n)\nbash-3.2$ y\nbash: y: command not found\nbash-3.2$ echo \"Done!\"\nbash: !\": event not found\nbash-3.2$\n\n\n\n\n\n\n\n\n\n\n\n\n",
+    "dimensions": [
+      24,
+      80
+    ]
+  },
+  "errors": [],
+  "captured_variables": {},
+  "all_commands_text": "echo \"Ready to continue? (y/n)\"\necho \"Done!\"",
+  "all_output_text": "Ready to continue? (y/n)\nbash: !\": event not found",
+  "success": true,
+  "failed_commands": []
+}

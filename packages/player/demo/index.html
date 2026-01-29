@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>reterm Player Demo</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: system-ui, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+      padding: 40px;
+      min-height: 100vh;
+    }
+    h1 {
+      margin-bottom: 24px;
+    }
+    .demo-section {
+      margin: 32px 0;
+    }
+    h2 {
+      font-size: 18px;
+      margin-bottom: 16px;
+      color: #aaa;
+    }
+  </style>
+</head>
+<body>
+  <h1>@reterm/player Demo</h1>
+
+  <div class="demo-section">
+    <h2>Default (Dracula theme)</h2>
+    <div id="player1"></div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Nord theme, auto-play, looping</h2>
+    <div id="player2"></div>
+  </div>
+
+  <div class="demo-section">
+    <h2>No controls, auto-play</h2>
+    <div id="player3"></div>
+  </div>
+
+  <script type="module">
+    import { TerminalPlayer } from '../dist/index.js';
+    import '../dist/style.css';
+    import { createElement } from 'react';
+    import { createRoot } from 'react-dom/client';
+
+    // Fetch the recording
+    const response = await fetch('./recording.json');
+    const recording = await response.json();
+
+    // Demo 1: Default
+    createRoot(document.getElementById('player1')).render(
+      createElement(TerminalPlayer, {
+        data: recording,
+        showControls: true,
+      })
+    );
+
+    // Demo 2: Nord theme, auto-play, loop
+    createRoot(document.getElementById('player2')).render(
+      createElement(TerminalPlayer, {
+        data: recording,
+        theme: 'nord',
+        autoPlay: true,
+        loop: true,
+        speed: 1.5,
+      })
+    );
+
+    // Demo 3: No controls
+    createRoot(document.getElementById('player3')).render(
+      createElement(TerminalPlayer, {
+        data: recording,
+        theme: 'github-dark',
+        autoPlay: true,
+        showControls: false,
+        loop: true,
+      })
+    );
+  </script>
+</body>
+</html>

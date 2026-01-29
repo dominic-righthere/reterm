@@ -1,0 +1,23 @@
+meta:
+  name: "Interactive Prompt Test"
+  description: "Tests wait_for functionality"
+
+config:
+  shell: /bin/bash
+  theme: dracula
+
+steps:
+  # Run a command that produces output
+  - run: echo "Ready to continue? (y/n)"
+
+  # Wait for the prompt text to appear
+  - wait_for: "Ready to continue?"
+    timeout: 5s
+
+  # Now type response
+  - type: "y"
+    then: enter
+
+  - sleep: 500ms
+
+  - run: echo "Done!"

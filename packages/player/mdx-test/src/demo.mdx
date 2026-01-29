@@ -1,0 +1,87 @@
+import { TerminalPlayer } from '@reterm/player';
+
+# Terminal Recording Demo
+
+This page demonstrates the `@reterm/player` React component embedded in MDX documentation.
+
+## Basic Usage
+
+Here's a terminal recording with default settings (Dracula theme, controls visible):
+
+<TerminalPlayer
+  src="/recording.json"
+  showControls
+/>
+
+## Auto-play with Loop
+
+This recording auto-plays and loops continuously with Nord theme:
+
+<TerminalPlayer
+  src="/recording.json"
+  theme="nord"
+  autoPlay
+  loop
+  speed={1.5}
+/>
+
+## Minimal Player
+
+No controls, auto-play, GitHub Dark theme - perfect for hero sections:
+
+<TerminalPlayer
+  src="/recording.json"
+  theme="github-dark"
+  autoPlay
+  loop
+  showControls={false}
+/>
+
+## Different Cursor Styles
+
+### Block cursor (default)
+
+<TerminalPlayer
+  src="/recording.json"
+  theme="monokai"
+  cursorStyle="block"
+/>
+
+### Bar cursor
+
+<TerminalPlayer
+  src="/recording.json"
+  theme="one-dark"
+  cursorStyle="bar"
+/>
+
+## Code Example
+
+```tsx
+import { TerminalPlayer } from '@reterm/player';
+import '@reterm/player/style.css';
+
+function Demo() {
+  return (
+    <TerminalPlayer
+      src="/recordings/demo.json"
+      autoPlay
+      theme="dracula"
+      showControls
+    />
+  );
+}
+```
+
+## Props Reference
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `data` | `RecordingLog` | - | Inline JSON data |
+| `src` | `string` | - | URL to fetch recording |
+| `autoPlay` | `boolean` | `false` | Auto-start playback |
+| `loop` | `boolean` | `false` | Loop when complete |
+| `speed` | `number` | `1.0` | Playback speed |
+| `theme` | `string` | from log | Theme override |
+| `showControls` | `boolean` | `true` | Show playback controls |
+| `cursorStyle` | `'block' \| 'underline' \| 'bar'` | `'block'` | Cursor style |

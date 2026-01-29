@@ -1,0 +1,32 @@
+meta:
+  name: "reterm Demo"
+  description: "Demonstrates reterm's AI-native terminal recording"
+
+config:
+  shell: /bin/zsh
+  theme: dracula
+  size: [80, 24]
+  typing_speed: 50ms
+
+output:
+  gif: demo.gif
+  log: demo.json
+
+steps:
+  # Simple command execution
+  - run: echo "Hello from reterm!"
+
+  - sleep: 500ms
+
+  # Show directory contents
+  - run: ls -la
+
+  - sleep: 500ms
+
+  # Show current date
+  - run: date
+
+  - sleep: 1s
+
+  # Note for the log (not visible in terminal)
+  - note: "Demo completed successfully"

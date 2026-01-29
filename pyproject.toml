@@ -1,0 +1,45 @@
+[project]
+name = "reterm"
+version = "0.1.0"
+description = "AI-native terminal recording tool with structured output"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "MIT"
+keywords = ["terminal", "recording", "gif", "mcp", "ai", "cli"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Multimedia :: Video :: Capture",
+]
+dependencies = [
+    "click>=8.1",
+    "pyte>=0.8",
+    "ptyprocess>=0.7",
+    "pillow>=10.0",
+    "imageio>=2.31",
+    "pydantic>=2.0",
+    "pyyaml>=6.0",
+    "rich>=13.0",
+    "fastmcp>=2.0",
+]
+
+[project.scripts]
+reterm = "reterm.cli:cli"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.23",
+    "ruff>=0.1",
+    "mypy>=1.0",
+]
