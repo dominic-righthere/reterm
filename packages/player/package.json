@@ -1,5 +1,5 @@
 {
-  "name": "@reterm/player",
+  "name": "reterm-player",
   "version": "0.1.0",
   "description": "React component for replaying terminal recordings from reterm JSON logs",
   "type": "module",
@@ -48,6 +48,6 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/reterm"
+    "url": "https://github.com/dominic-righthere/reterm"
   }
 }
