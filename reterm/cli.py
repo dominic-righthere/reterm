@@ -157,10 +157,10 @@ def redact(
     Examples:
 
         # Visible redaction (shows [HOME] in output)
-        reterm redact demo.json -p "/Users/dom" -r "HOME" -o redacted.json
+        reterm redact demo.json -p "/home/user" -r "HOME" -o redacted.json
 
         # Seamless replacement (looks like original)
-        reterm redact demo.json -p "/Users/dom" -r "/Users/alice" --seamless -o clean.json
+        reterm redact demo.json -p "/home/user" -r "/home/alice" --seamless -o clean.json
 
         # Regex pattern
         reterm redact demo.json -p "sk-[a-zA-Z0-9]+" -r "API_KEY" --regex -o redacted.json

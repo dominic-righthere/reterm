@@ -41,13 +41,28 @@ def render_gif_from_log(
 
     # Render frames from terminal snapshots
     for cmd in log.commands:
-        # Use terminal_after snapshot for each command
-        if cmd.terminal_after:
+        if cmd.intermediate_snapshots and cmd.terminal_after:
+            total_duration = cmd.duration_ms if cmd.duration_ms else int(1000 / fps)
+            snapshot_count = len(cmd.intermediate_snapshots) + 1
+            snapshot_duration = total_duration // snapshot_count
+
+            for snapshot in cmd.intermediate_snapshots:
+                frame = renderer.render_simple(
+                    lines=snapshot.screen_content,
+                    cursor_pos=snapshot.cursor_position,
+                )
+                writer.add_frame(frame, duration_ms=snapshot_duration)
+
             frame = renderer.render_simple(
                 lines=cmd.terminal_after.screen_content,
                 cursor_pos=cmd.terminal_after.cursor_position,
             )
-            # Use command duration or default frame duration
+            writer.add_frame(frame, duration_ms=snapshot_duration)
+        elif cmd.terminal_after:
+            frame = renderer.render_simple(
+                lines=cmd.terminal_after.screen_content,
+                cursor_pos=cmd.terminal_after.cursor_position,
+            )
             duration_ms = cmd.duration_ms if cmd.duration_ms else int(1000 / fps)
             writer.add_frame(frame, duration_ms=duration_ms)
 
@@ -61,6 +76,6 @@ def render_gif_from_log(
 
     # Save the GIF
     if writer.frames:
-        writer.save()
+        writer.save_optimized()
     else:
         raise ValueError("No frames to render - log has no terminal snapshots")

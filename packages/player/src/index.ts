@@ -17,7 +17,11 @@ export { useRecording } from './hooks/useRecording';
 export type { UseRecordingOptions, UseRecordingResult } from './hooks/useRecording';
 
 export { usePlayback } from './hooks/usePlayback';
-export type { UsePlaybackResult, PlaybackOptions, TimelineEntry } from './hooks/usePlayback';
+export type { UsePlaybackResult, PlaybackOptions } from './hooks/usePlayback';
+
+// Timeline utilities (usable outside React)
+export { buildTimeline } from './utils/timeline';
+export type { TimelineEntry } from './utils/timeline';
 
 // Themes
 export { themes, getTheme, listThemes, getAnsiColor, resolve256Color } from './themes';
