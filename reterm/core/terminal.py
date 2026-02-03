@@ -5,7 +5,7 @@ from datetime import datetime
 
 import pyte
 
-from reterm.output.models import TerminalSnapshot
+from reterm.output.models import StyledChar, TerminalSnapshot
 
 
 @dataclass
@@ -48,16 +48,64 @@ class Terminal:
         """Get terminal dimensions as (rows, cols)."""
         return (self.config.rows, self.config.cols)
 
-    def snapshot(self) -> TerminalSnapshot:
-        """Create a snapshot of current terminal state."""
+    def snapshot(self, include_styles: bool = True) -> TerminalSnapshot:
+        """Create a snapshot of current terminal state.
+
+        Args:
+            include_styles: Whether to include per-character style data.
+                Defaults to True. Set to False for internal probes where
+                style data is not needed.
+        """
         lines = self.get_lines()
+
+        styled_content = None
+        if include_styles:
+            styled_content = self._build_styled_content()
+
         return TerminalSnapshot(
             timestamp=datetime.now(),
             cursor_position=self.get_cursor_position(),
             screen_content=lines,
             screen_content_plain="\n".join(lines),
             dimensions=self.get_dimensions(),
+            styled_content=styled_content,
         )
+
+    def _build_styled_content(self) -> list[list[StyledChar]]:
+        """Build per-character styled content from the pyte screen buffer.
+
+        Trims trailing default-styled spaces from each line for compact serialization.
+        """
+        styled_lines: list[list[StyledChar]] = []
+        for row in range(self.config.rows):
+            line: list[StyledChar] = []
+            for col in range(self.config.cols):
+                char_data = self.screen.buffer[row][col]
+                line.append(
+                    StyledChar(
+                        char=char_data.data,
+                        fg=char_data.fg if char_data.fg != "default" else "default",
+                        bg=char_data.bg if char_data.bg != "default" else "default",
+                        bold=bool(char_data.bold),
+                        italic=bool(char_data.italics),
+                        underline=bool(char_data.underscore),
+                        reverse=bool(char_data.reverse),
+                    )
+                )
+            # Trim trailing default-styled whitespace for compact JSON
+            while (
+                line
+                and line[-1].char == " "
+                and line[-1].fg == "default"
+                and line[-1].bg == "default"
+                and not line[-1].bold
+                and not line[-1].italic
+                and not line[-1].underline
+                and not line[-1].reverse
+            ):
+                line.pop()
+            styled_lines.append(line)
+        return styled_lines
 
     def save_snapshot(self) -> TerminalSnapshot:
         """Create and save a snapshot to history."""

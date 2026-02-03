@@ -70,6 +70,10 @@ export function usePlayback(
   const startTimeRef = useRef<number | null>(null);
   const pausedAtRef = useRef<number>(0);
 
+  // Stabilize onComplete so inline callbacks don't restart the animation loop
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
+
   // Calculate total duration
   useEffect(() => {
     if (timeline.length > 0) {
@@ -119,7 +123,7 @@ export function usePlayback(
         } else {
           // Stop playback
           setState((s) => ({ ...s, isPlaying: false }));
-          onComplete?.();
+          onCompleteRef.current?.();
           return;
         }
       }
@@ -132,7 +136,7 @@ export function usePlayback(
     return () => {
       cancelAnimationFrame(animationId);
     };
-  }, [state.isPlaying, state.speed, state.totalDuration, timeline, loop, onComplete]);
+  }, [state.isPlaying, state.speed, state.totalDuration, timeline, loop]);
 
   const play = useCallback(() => {
     startTimeRef.current = null;

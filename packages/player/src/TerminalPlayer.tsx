@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useRecording } from './hooks/useRecording';
 import { usePlayback } from './hooks/usePlayback';
 import { Terminal, type CursorStyle } from './components/Terminal';
@@ -111,14 +112,23 @@ export function TerminalPlayer({
   // Resolve title from prop or recording metadata
   const resolvedTitle = title || recording?.metadata.script_file || 'Terminal';
 
-  // Handle callbacks
-  if (error && onError) {
-    onError(error);
-  }
-  if (recording && onLoad) {
-    // Only call on initial load
-    onLoad(recording);
-  }
+  // Handle callbacks in effects to avoid side effects during render
+  const onLoadRef = useRef(onLoad);
+  onLoadRef.current = onLoad;
+  const onErrorRef = useRef(onError);
+  onErrorRef.current = onError;
+
+  useEffect(() => {
+    if (error && onErrorRef.current) {
+      onErrorRef.current(error);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (recording && onLoadRef.current) {
+      onLoadRef.current(recording);
+    }
+  }, [recording]);
 
   // Get terminal dimensions
   const dimensions: [number, number] = recording?.metadata.terminal_size || [80, 24];

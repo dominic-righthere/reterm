@@ -227,6 +227,10 @@ class Engine:
                 hidden=step.hidden,
             )
 
+    # Unique markers for probing shell state - unlikely to collide with real output
+    _EXIT_CODE_MARKER = "___RETERM_EC:"
+    _CWD_MARKER = "___RETERM_CWD:"
+
     def _execute_run(self, step: Step) -> None:
         """Execute a run command."""
         if not self.pty or not self.terminal or not self.events:
@@ -249,18 +253,18 @@ class Engine:
             intermediate_snapshots=intermediate_snapshots,
         )
 
-        # Capture state after
+        # Capture state after command output (this is what the user sees)
         terminal_after = self.terminal.snapshot()
         finished_at = datetime.now()
 
-        # Extract output from terminal (simplified)
+        # Extract output from terminal (before injecting probes)
         stdout = self._extract_command_output(
             terminal_before.screen_content_plain,
             terminal_after.screen_content_plain,
         )
 
-        # For now, assume exit code 0 (we could enhance this later)
-        exit_code = 0
+        # Capture exit code and working directory via hidden probes
+        exit_code, working_directory = self._capture_shell_state()
 
         # Record command
         cmd = self.events.record_command(
@@ -270,6 +274,7 @@ class Engine:
             exit_code=exit_code,
             started_at=started_at,
             finished_at=finished_at,
+            working_directory=working_directory,
             terminal_before=terminal_before,
             terminal_after=terminal_after,
             intermediate_snapshots=intermediate_snapshots,
@@ -282,6 +287,52 @@ class Engine:
         # Handle expect
         if step.expect:
             self._check_expectations(step.expect, cmd.exit_code, stdout)
+
+    def _capture_shell_state(self) -> tuple[int, str]:
+        """Capture exit code and working directory by injecting probe commands.
+
+        Sends a single compound echo that outputs both markers, then parses
+        the result from terminal output.
+
+        Returns:
+            (exit_code, working_directory) - exit_code is -1 if parsing fails,
+            working_directory is "." if parsing fails.
+        """
+        if not self.pty or not self.terminal:
+            return (-1, ".")
+
+        ec_marker = self._EXIT_CODE_MARKER
+        cwd_marker = self._CWD_MARKER
+
+        # Single probe: capture $? first (before it gets overwritten by pwd),
+        # then capture pwd. Use a subshell-free approach to preserve $?.
+        # The semicolon between the two echos will reset $?, so we save it first.
+        self.pty.write_line(
+            f'__rc=$?; echo "{ec_marker}$__rc___"; echo "{cwd_marker}$PWD___"'
+        )
+        self._read_and_capture(idle_timeout=0.3, max_timeout=5.0)
+
+        # Read the terminal to find our markers
+        screen_text = self.terminal.get_text()
+
+        exit_code = self._parse_marker(screen_text, ec_marker, default="-1")
+        cwd_raw = self._parse_marker(screen_text, cwd_marker, default=".")
+
+        try:
+            exit_code_int = int(exit_code)
+        except ValueError:
+            exit_code_int = -1
+
+        return (exit_code_int, cwd_raw)
+
+    @staticmethod
+    def _parse_marker(screen_text: str, marker: str, default: str = "") -> str:
+        """Parse a value from terminal text between a marker prefix and '___' suffix."""
+        for line in screen_text.split("\n"):
+            line = line.strip()
+            if line.startswith(marker) and line.endswith("___"):
+                return line[len(marker):-3]
+        return default
 
     def _execute_type(self, step: Step) -> None:
         """Execute a type command with animation."""
@@ -472,20 +523,58 @@ class Engine:
         return re.sub(r"\$\{(\w+)\}", replace, text)
 
     def _extract_command_output(self, before: str, after: str) -> str:
-        """Extract command output by comparing terminal states."""
-        before_lines = before.split("\n")
-        after_lines = after.split("\n")
+        """Extract command output by comparing terminal states.
 
-        # Find new lines
-        new_lines = []
-        for i, line in enumerate(after_lines):
-            if i >= len(before_lines) or line != before_lines[i]:
-                new_lines.append(line)
+        Strategy: find the first and last changed lines. The first changed line
+        is typically the command echo, the last is the new prompt. Everything
+        between them is the output.
 
-        # Skip the command echo and prompt
-        if len(new_lines) >= 2:
-            return "\n".join(new_lines[1:-1])
-        return ""
+        Handles scrolling by comparing from both ends to find the stable
+        boundaries.
+        """
+        before_lines = [l.rstrip() for l in before.split("\n")]
+        after_lines = [l.rstrip() for l in after.split("\n")]
+
+        # Find first line that differs
+        first_diff = 0
+        for i in range(min(len(before_lines), len(after_lines))):
+            if before_lines[i] != after_lines[i]:
+                first_diff = i
+                break
+        else:
+            # All shared lines are the same - check if after has more lines
+            first_diff = min(len(before_lines), len(after_lines))
+
+        # Find last line that differs (scan from bottom)
+        last_diff = len(after_lines) - 1
+        b_end = len(before_lines) - 1
+        a_end = len(after_lines) - 1
+        while b_end >= first_diff and a_end >= first_diff:
+            if before_lines[b_end].rstrip() != after_lines[a_end].rstrip():
+                break
+            b_end -= 1
+            a_end -= 1
+        last_diff = a_end
+
+        # Extract the changed region
+        changed = after_lines[first_diff : last_diff + 1]
+
+        if not changed:
+            return ""
+
+        # Skip the command echo (first changed line) and new prompt (last changed line)
+        # But only if there are enough lines - a single changed line means either
+        # just the command echo or just output on one line
+        if len(changed) == 1:
+            # Single changed line - could be the command echo with no output
+            return ""
+        elif len(changed) == 2:
+            # Two changed lines: command echo + prompt, no output between them
+            return ""
+        else:
+            # Skip first (command echo) and last (new prompt)
+            output_lines = changed[1:-1]
+            return "\n".join(output_lines).strip()
 
     def _check_expectations(
         self,

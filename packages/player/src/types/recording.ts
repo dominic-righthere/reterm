@@ -3,12 +3,23 @@
  * These mirror the Python Pydantic models from reterm/output/models.py
  */
 
+export interface StyledChar {
+  char: string;
+  fg: string; // 'default', color name, or hex
+  bg: string; // 'default', color name, or hex
+  bold?: boolean;
+  italic?: boolean;
+  underline?: boolean;
+  reverse?: boolean;
+}
+
 export interface TerminalSnapshot {
   timestamp: string;
   cursor_position: [number, number]; // [row, col]
   screen_content: string[];
   screen_content_plain: string;
   dimensions: [number, number]; // [rows, cols]
+  styled_content?: StyledChar[][]; // Per-character styled content
 }
 
 export interface CommandExecution {

@@ -6,6 +6,18 @@ from typing import Any
 from pydantic import BaseModel, Field
 
 
+class StyledChar(BaseModel):
+    """A single character with ANSI style information."""
+
+    char: str = Field(description="The character")
+    fg: str = Field(default="default", description="Foreground color (name, hex, or 'default')")
+    bg: str = Field(default="default", description="Background color (name, hex, or 'default')")
+    bold: bool = False
+    italic: bool = False
+    underline: bool = False
+    reverse: bool = False
+
+
 class TerminalSnapshot(BaseModel):
     """Captures terminal state at a point in time."""
 
@@ -14,10 +26,20 @@ class TerminalSnapshot(BaseModel):
     screen_content: list[str] = Field(description="Each line of terminal content")
     screen_content_plain: str = Field(description="All lines joined with newlines")
     dimensions: tuple[int, int] = Field(description="(rows, cols)")
+    styled_content: list[list[StyledChar]] | None = Field(
+        default=None,
+        description="Per-character styled content for each line. Each line is a list of StyledChar with fg/bg/bold/italic/underline/reverse attributes.",
+    )
 
 
 class CommandExecution(BaseModel):
-    """A single command execution with full context."""
+    """A single command execution with full context.
+
+    Note on stdout/stderr: Because commands run inside a PTY, stdout and stderr
+    are merged into a single stream by the kernel. The ``stderr`` field will
+    always be empty and ``stdout`` / ``combined_output`` both contain the merged
+    PTY output. Use ``exit_code`` to determine success or failure.
+    """
 
     id: str = Field(description="Unique identifier for this command")
     command: str = Field(description="The command that was executed")
@@ -25,9 +47,16 @@ class CommandExecution(BaseModel):
     finished_at: datetime
     duration_ms: int = Field(description="Execution time in milliseconds")
     exit_code: int
-    stdout: str = Field(description="Full stdout capture")
-    stderr: str = Field(description="Full stderr capture")
-    combined_output: str = Field(description="Interleaved output as user would see")
+    stdout: str = Field(
+        description="Captured output (merged stdout+stderr from PTY)"
+    )
+    stderr: str = Field(
+        default="",
+        description="Always empty — PTY merges stderr into stdout. Kept for schema compatibility.",
+    )
+    combined_output: str = Field(
+        description="Same as stdout (PTY merges both streams)"
+    )
     working_directory: str = Field(description="CWD at execution time")
     terminal_before: TerminalSnapshot | None = None
     terminal_after: TerminalSnapshot | None = None
