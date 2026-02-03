@@ -38,6 +38,8 @@ class AltScreenMixin:
 
     This handles DEC private modes 47, 1047, and 1049 which are used by
     full-screen applications like tmux, vim, less, htop, etc.
+
+    Also fixes pyte method signatures that don't accept **kwargs properly.
     """
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
@@ -75,6 +77,11 @@ class AltScreenMixin:
                     return
 
         super().reset_mode(*modes, **kwargs)
+
+    def report_device_status(self, mode: int, **kwargs: Any) -> None:
+        """Override to accept private kwarg that pyte's Stream passes."""
+        # pyte.Stream passes private=True but pyte.Screen doesn't accept it
+        super().report_device_status(mode)
 
     def _enter_alt_screen(self, save_cursor: bool = False) -> None:
         """Switch to alternate screen buffer."""
