@@ -1,11 +1,122 @@
-"""Terminal emulation using pyte."""
+"""Terminal emulation using pyte.
 
+Extends pyte with:
+- Alternate screen buffer support (for tmux, vim, etc.)
+- Proper DEC line drawing charset handling
+"""
+
+import copy
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Any
 
 import pyte
+from pyte.screens import Char
 
 from reterm.output.models import StyledChar, TerminalSnapshot
+
+
+# Alternate screen private modes (from xterm)
+ALT_SCREEN_MODES = {
+    47,    # Use Alternate Screen Buffer (old xterm)
+    1047,  # Use Alternate Screen Buffer (xterm)
+    1049,  # Save cursor + Use Alternate Screen Buffer (most common)
+}
+
+
+def _empty_buffer(rows: int, cols: int) -> dict[int, dict[int, Char]]:
+    """Create an empty screen buffer."""
+    default_char = Char(" ", "default", "default", False, False, False, False, False)
+    return {
+        row: {col: default_char for col in range(cols)}
+        for row in range(rows)
+    }
+
+
+class AltScreenMixin:
+    """Mixin that adds alternate screen buffer support to pyte.Screen.
+
+    This handles DEC private modes 47, 1047, and 1049 which are used by
+    full-screen applications like tmux, vim, less, htop, etc.
+    """
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        self._alt_buffer: dict[int, dict[int, Char]] | None = None
+        self._alt_cursor: tuple[int, int] | None = None
+        self._saved_cursor_main: tuple[int, int] | None = None
+        self._on_alt_screen = False
+
+    @property
+    def on_alt_screen(self) -> bool:
+        """Whether currently on alternate screen."""
+        return self._on_alt_screen
+
+    def set_mode(self, *modes: int, **kwargs: Any) -> None:
+        """Override to handle alternate screen modes."""
+        private = kwargs.get("private", False)
+
+        if private:
+            for mode in modes:
+                if mode in ALT_SCREEN_MODES:
+                    self._enter_alt_screen(save_cursor=(mode == 1049))
+                    return
+
+        super().set_mode(*modes, **kwargs)
+
+    def reset_mode(self, *modes: int, **kwargs: Any) -> None:
+        """Override to handle alternate screen modes."""
+        private = kwargs.get("private", False)
+
+        if private:
+            for mode in modes:
+                if mode in ALT_SCREEN_MODES:
+                    self._exit_alt_screen(restore_cursor=(mode == 1049))
+                    return
+
+        super().reset_mode(*modes, **kwargs)
+
+    def _enter_alt_screen(self, save_cursor: bool = False) -> None:
+        """Switch to alternate screen buffer."""
+        if self._on_alt_screen:
+            return
+
+        # Save main screen cursor position if requested (mode 1049)
+        if save_cursor:
+            self._saved_cursor_main = (self.cursor.y, self.cursor.x)
+
+        # Save main buffer, switch to alternate
+        self._alt_buffer = self.buffer
+        self.buffer = _empty_buffer(self.lines, self.columns)
+
+        # Reset cursor to top-left on alternate screen
+        self.cursor.y = 0
+        self.cursor.x = 0
+
+        self._on_alt_screen = True
+        self.dirty.update(range(self.lines))
+
+    def _exit_alt_screen(self, restore_cursor: bool = False) -> None:
+        """Switch back to main screen buffer."""
+        if not self._on_alt_screen or self._alt_buffer is None:
+            return
+
+        # Restore main buffer
+        self.buffer = self._alt_buffer
+        self._alt_buffer = None
+
+        # Restore cursor position if we saved it
+        if restore_cursor and self._saved_cursor_main:
+            self.cursor.y, self.cursor.x = self._saved_cursor_main
+            self._saved_cursor_main = None
+
+        self._on_alt_screen = False
+        self.dirty.update(range(self.lines))
+
+
+class Screen(AltScreenMixin, pyte.Screen):
+    """Extended pyte.Screen with alternate screen buffer support."""
+    pass
 
 
 @dataclass
@@ -17,12 +128,19 @@ class TerminalConfig:
 
 
 class Terminal:
-    """Terminal emulator wrapper around pyte."""
+    """Terminal emulator wrapper around pyte.
+
+    Uses an extended Screen class with alternate screen buffer support
+    for compatibility with tmux, vim, and other full-screen applications.
+    """
 
     def __init__(self, config: TerminalConfig | None = None) -> None:
         self.config = config or TerminalConfig()
-        self.screen = pyte.Screen(self.config.cols, self.config.rows)
+        self.screen = Screen(self.config.cols, self.config.rows)
         self.stream = pyte.Stream(self.screen)
+        # Disable UTF-8 mode to enable DEC line drawing charset switching
+        # This allows box-drawing characters (┌─┐│└┘) used by tmux, etc.
+        self.stream.use_utf8 = False
         self._history: list[TerminalSnapshot] = []
 
     def feed(self, data: str) -> None:
