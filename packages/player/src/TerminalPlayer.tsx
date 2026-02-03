@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { useRecording } from './hooks/useRecording';
 import { usePlayback } from './hooks/usePlayback';
 import { Terminal, type CursorStyle } from './components/Terminal';
@@ -6,6 +6,63 @@ import { WindowFrame } from './components/WindowFrame';
 import { Controls } from './components/Controls';
 import { getTheme, type Theme } from './themes';
 import type { RecordingLog } from './types/recording';
+
+/**
+ * Hook to measure container width and calculate scale factor for fit mode.
+ */
+function useFitScale(
+  enabled: boolean,
+  nativeWidth: number,
+  fontSize: number,
+  fontFamily: string
+) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [scale, setScale] = useState(1);
+  const [charWidth, setCharWidth] = useState(fontSize * 0.6);
+
+  // Measure character width
+  useEffect(() => {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.font = `${fontSize}px ${fontFamily.split(',')[0].replace(/"/g, '')}`;
+      const measured = ctx.measureText('M').width;
+      setCharWidth(measured);
+    }
+  }, [fontSize, fontFamily]);
+
+  const updateScale = useCallback(() => {
+    if (!enabled || !containerRef.current) {
+      setScale(1);
+      return;
+    }
+
+    const containerWidth = containerRef.current.offsetWidth;
+    // Terminal width = cols * charWidth + padding (32px)
+    const terminalWidth = nativeWidth * charWidth + 32;
+
+    if (containerWidth < terminalWidth) {
+      setScale(containerWidth / terminalWidth);
+    } else {
+      setScale(1);
+    }
+  }, [enabled, nativeWidth, charWidth]);
+
+  useEffect(() => {
+    updateScale();
+
+    if (!enabled) return;
+
+    const resizeObserver = new ResizeObserver(updateScale);
+    if (containerRef.current) {
+      resizeObserver.observe(containerRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, [enabled, updateScale]);
+
+  return { containerRef, scale, charWidth };
+}
 
 export interface TerminalPlayerProps {
   /** Inline recording data */
@@ -36,6 +93,12 @@ export interface TerminalPlayerProps {
   showWindowFrame?: boolean;
   /** Window title (defaults to script name from recording or 'Terminal') */
   title?: string;
+  /**
+   * Scale terminal to fit container width.
+   * When true, the terminal scales down (never up) to fit available width.
+   * Preserves exact character layout and aspect ratio.
+   */
+  fit?: boolean;
   /** Callback when playback completes */
   onComplete?: () => void;
   /** Callback when recording loads */
@@ -73,6 +136,8 @@ export interface TerminalPlayerProps {
  * />
  * ```
  */
+const DEFAULT_FONT_FAMILY = '"SF Mono", "Fira Code", "JetBrains Mono", Menlo, Monaco, "Cascadia Code", Consolas, monospace';
+
 export function TerminalPlayer({
   data,
   src,
@@ -82,12 +147,13 @@ export function TerminalPlayer({
   theme: themeName,
   showControls = true,
   fontSize = 14,
-  fontFamily,
+  fontFamily = DEFAULT_FONT_FAMILY,
   showCursor = true,
   cursorStyle = 'block',
   typingSpeed = 50,
   showWindowFrame = true,
   title,
+  fit = false,
   onComplete,
   onLoad,
   onError,
@@ -112,6 +178,16 @@ export function TerminalPlayer({
   // Resolve title from prop or recording metadata
   const resolvedTitle = title || recording?.metadata.script_file || 'Terminal';
 
+  // Get terminal dimensions
+  const dimensions: [number, number] = recording?.metadata.terminal_size || [80, 24];
+  const [cols, rows] = dimensions;
+
+  // Fit mode scaling
+  const { containerRef, scale, charWidth } = useFitScale(fit, cols, fontSize, fontFamily);
+  const lineHeight = Math.round(fontSize * 1.4);
+  const nativeWidth = cols * charWidth + 32;
+  const nativeHeight = rows * lineHeight + 24 + (showControls ? 40 : 0) + (showWindowFrame ? 36 : 0);
+
   // Handle callbacks in effects to avoid side effects during render
   const onLoadRef = useRef(onLoad);
   onLoadRef.current = onLoad;
@@ -129,9 +205,6 @@ export function TerminalPlayer({
       onLoadRef.current(recording);
     }
   }, [recording]);
-
-  // Get terminal dimensions
-  const dimensions: [number, number] = recording?.metadata.terminal_size || [80, 24];
 
   if (loading) {
     const loadingContent = (
@@ -237,6 +310,52 @@ export function TerminalPlayer({
       )}
     </>
   );
+
+  // Wrap content with scaling container for fit mode
+  const scaledContent = fit ? (
+    <div
+      style={{
+        width: `${nativeWidth}px`,
+        transform: `scale(${scale})`,
+        transformOrigin: 'top left',
+      }}
+    >
+      {showWindowFrame ? (
+        <WindowFrame title={resolvedTitle} theme={resolvedTheme}>
+          {terminalContent}
+        </WindowFrame>
+      ) : (
+        <div
+          style={{
+            borderRadius: '8px',
+            overflow: 'hidden',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+          }}
+        >
+          {terminalContent}
+        </div>
+      )}
+    </div>
+  ) : null;
+
+  // Fit mode container - scales content to fit width
+  if (fit) {
+    return (
+      <div
+        ref={containerRef}
+        className={`reterm-player ${className || ''}`}
+        style={{
+          display: 'block',
+          width: '100%',
+          height: `${nativeHeight * scale}px`,
+          overflow: 'hidden',
+          ...style,
+        }}
+      >
+        {scaledContent}
+      </div>
+    );
+  }
 
   if (showWindowFrame) {
     return (
