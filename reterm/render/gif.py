@@ -40,15 +40,12 @@ class GIFWriter:
         # Convert PIL images to numpy arrays
         arrays = [np.array(f) for f in self.frames]
 
-        # Convert durations from ms to seconds
-        durations = [d / 1000.0 for d in self.frame_durations]
-
-        # Save using imageio
+        # Save using imageio (duration is in milliseconds)
         iio.imwrite(
             self.output_path,
             arrays,
             extension=".gif",
-            duration=durations,
+            duration=self.frame_durations,
             loop=self.loop,
         )
 
@@ -77,13 +74,12 @@ class GIFWriter:
 
         # Save optimized version
         arrays = [np.array(f) for f in optimized_frames]
-        durations = [d / 1000.0 for d in optimized_durations]
 
         iio.imwrite(
             self.output_path,
             arrays,
             extension=".gif",
-            duration=durations,
+            duration=optimized_durations,
             loop=self.loop,
         )
 

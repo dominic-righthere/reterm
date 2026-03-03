@@ -1,5 +1,6 @@
 """Main engine orchestrating terminal recording."""
 
+import copy
 import os
 import re
 import time
@@ -304,6 +305,14 @@ class Engine:
         ec_marker = self._EXIT_CODE_MARKER
         cwd_marker = self._CWD_MARKER
 
+        # Hide recording so probe output doesn't appear in GIF frames
+        self._recording_hidden = True
+
+        # Save terminal state so probe output doesn't leak into subsequent frames
+        saved_buffer = copy.deepcopy(self.terminal.screen.buffer)
+        saved_cursor_x = self.terminal.screen.cursor.x
+        saved_cursor_y = self.terminal.screen.cursor.y
+
         # Single probe: capture $? first (before it gets overwritten by pwd),
         # then capture pwd. Use a subshell-free approach to preserve $?.
         # The semicolon between the two echos will reset $?, so we save it first.
@@ -317,6 +326,13 @@ class Engine:
 
         exit_code = self._parse_marker(screen_text, ec_marker, default="-1")
         cwd_raw = self._parse_marker(screen_text, cwd_marker, default=".")
+
+        # Restore terminal state to erase probe output
+        self.terminal.screen.buffer = saved_buffer
+        self.terminal.screen.cursor.x = saved_cursor_x
+        self.terminal.screen.cursor.y = saved_cursor_y
+
+        self._recording_hidden = False
 
         try:
             exit_code_int = int(exit_code)
@@ -498,9 +514,12 @@ class Engine:
         frame = self.renderer.render(styled_lines, cursor_pos)
         self.frames.append(frame)
 
-        # Calculate duration
+        # Calculate duration (enforce minimum to avoid 0ms frames)
         if self._last_frame_time > 0:
-            duration_ms = int((now - self._last_frame_time) * 1000)
+            duration_ms = max(
+                int((now - self._last_frame_time) * 1000),
+                int(1000 / self.config.frame_rate),
+            )
         else:
             duration_ms = int(1000 / self.config.frame_rate)
         self.frame_durations.append(duration_ms)
