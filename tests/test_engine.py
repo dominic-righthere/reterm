@@ -130,11 +130,18 @@ class TestShellProbes:
         assert "set +H" in Engine._SHELL_SETUP  # bash
 
     def test_zsh_setup_emits_osc133_marks(self):
-        setup = Engine()._shell_setup_commands()
+        # Pass shell explicitly so the assertion doesn't depend on the host's
+        # $SHELL (CI runners default to bash).
+        setup = Engine(shell="/bin/zsh")._shell_setup_commands()
         # Hooks emit the C (output start) and D (exit code) marks, and the
         # D hook is prepended to precmd so it fires before the prompt theme's.
         assert "133;C" in setup and "133;D" in setup
         assert "precmd_functions=(__rt_pc $precmd_functions)" in setup
+
+    def test_bash_setup_emits_osc133_marks(self):
+        setup = Engine(shell="/bin/bash")._shell_setup_commands()
+        assert "133;C" in setup and "133;D" in setup
+        assert "PS0=" in setup  # output-start mark via PS0 (bash >= 4.4)
 
 
 class TestMarkedOutput:
