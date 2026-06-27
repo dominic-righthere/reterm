@@ -1,13 +1,16 @@
 """MCP server for AI tool integration."""
 
+import io
 import json
 from typing import Any
 
 from fastmcp import FastMCP
+from fastmcp.utilities.types import Image
 
 from reterm.core.engine import Engine
-from reterm.output.models import RecordingLog, Script
-from reterm.render.themes import list_themes
+from reterm.output.models import RecordingLog
+from reterm.render.frame import FrameRenderer
+from reterm.render.themes import list_themes, get_theme
 from reterm.script.parser import ScriptError, parse_script_string
 
 # Create the MCP server
@@ -284,6 +287,131 @@ steps:
   # Add a note (appears in log, not terminal)
   - note: "Demo completed successfully"
 """
+
+
+@mcp.tool
+def format_as_markdown(
+    log: dict[str, Any],
+    title: str | None = None,
+) -> str:
+    """Format a recording log as markdown text for attachment or sharing.
+
+    Takes the dict returned by run_script or run_command and produces a
+    clean markdown document with each command and its output in fenced
+    code blocks — ready to paste into docs, issues, or Claude messages.
+
+    Args:
+        log: The recording log dict returned by run_script / run_command
+        title: Optional heading override (defaults to the recording name)
+
+    Returns:
+        Markdown-formatted string with commands and their outputs.
+    """
+    lines: list[str] = []
+
+    # Heading
+    heading = title or (log.get("metadata") or {}).get("name") or "Terminal Recording"
+    lines.append(f"# {heading}")
+    lines.append("")
+
+    commands = log.get("commands", [])
+    if not commands:
+        # run_command returns a flat dict, not nested commands
+        cmd = log.get("command")
+        output = log.get("combined_output") or log.get("stdout") or ""
+        exit_code = log.get("exit_code", 0)
+        if cmd:
+            lines.append(f"```bash\n$ {cmd}\n```")
+            if output.strip():
+                lines.append(f"```\n{output.rstrip()}\n```")
+            if exit_code != 0:
+                lines.append(f"> Exit code: `{exit_code}`")
+    else:
+        for cmd_entry in commands:
+            command = cmd_entry.get("command", "")
+            output = cmd_entry.get("combined_output") or cmd_entry.get("stdout") or ""
+            exit_code = cmd_entry.get("exit_code", 0)
+
+            lines.append(f"```bash\n$ {command}\n```")
+            if output.strip():
+                lines.append(f"```\n{output.rstrip()}\n```")
+            if exit_code != 0:
+                lines.append(f"> Exit code: `{exit_code}`")
+            lines.append("")
+
+    # Footer summary
+    success = log.get("success", True)
+    lines.append("---")
+    lines.append(f"*Status: {'✓ success' if success else '✗ failed'}*")
+
+    return "\n".join(lines)
+
+
+@mcp.tool
+def screenshot_terminal(
+    script_content: str,
+    theme: str = "dracula",
+    shell: str | None = None,
+    snapshot: str = "final",
+) -> Image:
+    """Run a script and return a PNG screenshot of the terminal state.
+
+    Executes the script and renders the terminal as a pixel-perfect image
+    using the selected theme. Returns an MCP image that Claude can display
+    inline — useful for visually verifying command output or creating docs.
+
+    Args:
+        script_content: The .reterm script content in YAML format
+        theme: Terminal color theme (dracula, nord, monokai, etc.)
+        shell: Shell to use (default: $SHELL or /bin/zsh)
+        snapshot: Which terminal state to capture — "final" (default) or
+                  "before"/"after" the first command
+
+    Returns:
+        PNG image of the terminal.
+    """
+    try:
+        script = parse_script_string(script_content)
+    except ScriptError as e:
+        raise ValueError(f"Script parse error: {e}") from e
+
+    engine = Engine(shell=shell, theme=theme, generate_gif=False)
+    result = engine.run(script)
+    log = result.log
+
+    # Pick the snapshot to render
+    terminal_snapshot = None
+    if snapshot == "final":
+        terminal_snapshot = log.final_terminal_state
+    elif snapshot == "before" and log.commands:
+        terminal_snapshot = log.commands[0].terminal_before
+    elif snapshot == "after" and log.commands:
+        terminal_snapshot = log.commands[-1].terminal_after
+
+    if terminal_snapshot is None:
+        raise ValueError("No terminal snapshot available — run at least one command")
+
+    cols, rows = log.metadata.terminal_size
+    theme_obj = get_theme(theme)
+    renderer = FrameRenderer(cols=cols, rows=rows, theme=theme_obj)
+
+    styled = terminal_snapshot.styled_content
+    if styled:
+        styled_lines = [
+            [(sc.char, {"fg": sc.fg, "bg": sc.bg, "bold": sc.bold, "italic": sc.italic, "reverse": sc.reverse, "underscore": sc.underline})
+             for sc in line]
+            for line in styled
+        ]
+        img = renderer.render(styled_lines, cursor_pos=terminal_snapshot.cursor_position)
+    else:
+        img = renderer.render_simple(
+            terminal_snapshot.screen_content,
+            cursor_pos=terminal_snapshot.cursor_position,
+        )
+
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return Image(data=buf.getvalue(), format="png")
 
 
 def run_server(transport: str = "stdio", port: int = 8080) -> None:

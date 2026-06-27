@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>reterm Player Demo</title>
+  <script type="importmap">
+  {
+    "imports": {
+      "react": "https://esm.sh/react@18.3.1",
+      "react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
+      "react-dom/client": "https://esm.sh/react-dom@18.3.1/client"
+    }
+  }
+  </script>
   <style>
     * {
       box-sizing: border-box;
@@ -46,11 +55,21 @@
     <div id="player3"></div>
   </div>
 
+  <div class="demo-section">
+    <h2>Fit mode - 400px container</h2>
+    <div id="player4" style="width: 400px; border: 2px dashed #444; padding: 10px;"></div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Fit mode - 600px container</h2>
+    <div id="player5" style="width: 600px; border: 2px dashed #444; padding: 10px;"></div>
+  </div>
+
+  <link rel="stylesheet" href="../dist/style.css">
   <script type="module">
-    import { TerminalPlayer } from '../dist/index.js';
-    import '../dist/style.css';
     import { createElement } from 'react';
     import { createRoot } from 'react-dom/client';
+    import { TerminalPlayer } from '../dist/index.js';
 
     // Fetch the recording
     const response = await fetch('./recording.json');
@@ -83,6 +102,25 @@
         autoPlay: true,
         showControls: false,
         loop: true,
+      })
+    );
+
+    // Demo 4: Fit mode - narrow
+    createRoot(document.getElementById('player4')).render(
+      createElement(TerminalPlayer, {
+        data: recording,
+        fit: true,
+        autoPlay: true,
+        loop: true,
+      })
+    );
+
+    // Demo 5: Fit mode - medium
+    createRoot(document.getElementById('player5')).render(
+      createElement(TerminalPlayer, {
+        data: recording,
+        fit: true,
+        theme: 'nord',
       })
     );
   </script>

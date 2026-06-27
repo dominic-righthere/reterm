@@ -1,6 +1,5 @@
 """Tests for the terminal module."""
 
-import pytest
 
 from reterm.core.terminal import Terminal, TerminalConfig, Screen
 

@@ -47,7 +47,12 @@
     "reterm",
     "mdx"
   ],
+  "author": "Dominic <dominic.righthere@gmail.com>",
   "license": "MIT",
+  "homepage": "https://github.com/dominic-righthere/reterm/tree/main/packages/player",
+  "bugs": {
+    "url": "https://github.com/dominic-righthere/reterm/issues"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/dominic-righthere/reterm"
