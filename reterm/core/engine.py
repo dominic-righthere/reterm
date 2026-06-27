@@ -327,18 +327,24 @@ class Engine:
         saved_cursor_x = self.terminal.screen.cursor.x
         saved_cursor_y = self.terminal.screen.cursor.y
 
-        # Append a sentinel echo and block until it appears, so ALL of the
+        # Append a sentinel and block until it appears in OUTPUT, so ALL of the
         # (long, multi-line) setup echo is consumed while hidden. Without this
         # barrier, late-arriving setup bytes can land after we un-hide and leak
         # the hook definitions into recorded frames.
-        sentinel = "__RT_SETUP_DONE__"
-        self.pty.write_line(f"{self._shell_setup_commands()}; echo {sentinel}")
+        #
+        # The marker uses arithmetic expansion so it appears ONLY in the
+        # command's output, never in the echoed command line: the shell echoes
+        # `echo __RTDONE$((21*2))__` but prints `__RTDONE42__`. Matching the
+        # literal `__RTDONE42__` therefore waits for the command to actually run,
+        # not merely for its echo to render.
+        marker = "__RTDONE42__"
+        self.pty.write_line(f"{self._shell_setup_commands()}; echo __RTDONE$((21*2))__")
         deadline = time.time() + 5.0
         while time.time() < deadline:
             self.pty.read(timeout=0.05)
-            if sentinel in self.terminal.get_text():
+            if marker in self.terminal.get_text():
                 break
-        # Drain the prompt redraw that follows the sentinel (still hidden).
+        # Drain the prompt redraw that follows the marker (still hidden).
         self._read_and_capture(idle_timeout=0.2, max_timeout=1.0)
 
         self.terminal.screen.buffer = saved_buffer

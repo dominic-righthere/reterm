@@ -3,9 +3,9 @@
   "metadata": {
     "tool_version": "0.1.0",
     "script_file": "reterm",
-    "started_at": "2026-06-28T05:54:37.284092",
-    "finished_at": "2026-06-28T05:54:39.982110",
-    "total_duration_ms": 2698,
+    "started_at": "2026-06-28T08:14:30.542083",
+    "finished_at": "2026-06-28T08:14:33.310649",
+    "total_duration_ms": 2768,
     "shell": "/bin/zsh",
     "terminal_size": [
       80,
@@ -19,16 +19,16 @@
     {
       "id": "cmd_001",
       "command": "echo \"reterm: terminal recordings for humans and AI\"",
-      "started_at": "2026-06-28T05:54:38.316988",
-      "finished_at": "2026-06-28T05:54:38.890662",
-      "duration_ms": 573,
+      "started_at": "2026-06-28T08:14:31.616558",
+      "finished_at": "2026-06-28T08:14:32.184130",
+      "duration_ms": 567,
       "exit_code": 0,
       "stdout": "reterm: terminal recordings for humans and AI",
       "stderr": "",
       "combined_output": "reterm: terminal recordings for humans and AI",
       "working_directory": "/Users/dom/work/development/projects/reterm",
       "terminal_before": {
-        "timestamp": "2026-06-28T05:54:38.316949",
+        "timestamp": "2026-06-28T08:14:31.616530",
         "cursor_position": [
           0,
           52
@@ -532,7 +532,7 @@
         ]
       },
       "terminal_after": {
-        "timestamp": "2026-06-28T05:54:38.890616",
+        "timestamp": "2026-06-28T08:14:32.184027",
         "cursor_position": [
           3,
           52
@@ -2381,7 +2381,7 @@
       },
       "intermediate_snapshots": [
         {
-          "timestamp": "2026-06-28T05:54:38.318738",
+          "timestamp": "2026-06-28T08:14:31.619531",
           "cursor_position": [
             0,
             53
@@ -2907,16 +2907,16 @@
     {
       "id": "cmd_002",
       "command": "ls examples",
-      "started_at": "2026-06-28T05:54:38.892391",
-      "finished_at": "2026-06-28T05:54:39.438422",
-      "duration_ms": 546,
+      "started_at": "2026-06-28T08:14:32.189280",
+      "finished_at": "2026-06-28T08:14:32.743257",
+      "duration_ms": 553,
       "exit_code": 0,
-      "stdout": "demo.json          demo.reterm        hero.reterm        interactive.reterm",
+      "stdout": "demo.json          hero.reterm        player.reterm\ndemo.reterm        interactive.reterm",
       "stderr": "",
-      "combined_output": "demo.json          demo.reterm        hero.reterm        interactive.reterm",
+      "combined_output": "demo.json          hero.reterm        player.reterm\ndemo.reterm        interactive.reterm",
       "working_directory": "/Users/dom/work/development/projects/reterm",
       "terminal_before": {
-        "timestamp": "2026-06-28T05:54:38.892381",
+        "timestamp": "2026-06-28T08:14:32.189225",
         "cursor_position": [
           3,
           52
@@ -4764,9 +4764,9 @@
         ]
       },
       "terminal_after": {
-        "timestamp": "2026-06-28T05:54:39.438383",
+        "timestamp": "2026-06-28T08:14:32.743183",
         "cursor_position": [
-          5,
+          6,
           52
         ],
         "screen_content": [
@@ -4774,9 +4774,9 @@
           "dings for humans and AI\"",
           "reterm: terminal recordings for humans and AI",
           "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples",
-          "demo.json          demo.reterm        hero.reterm        interactive.reterm",
+          "demo.json          hero.reterm        player.reterm",
+          "demo.reterm        interactive.reterm",
           "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗",
-          "",
           "",
           "",
           "",
@@ -4785,7 +4785,7 @@
           "",
           ""
         ],
-        "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          demo.reterm        hero.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗\n\n\n\n\n\n\n\n",
+        "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          hero.reterm        player.reterm\ndemo.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗\n\n\n\n\n\n\n",
         "dimensions": [
           14,
           80
@@ -6880,7 +6880,7 @@
               "reverse": false
             },
             {
-              "char": "d",
+              "char": "h",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -6898,7 +6898,7 @@
               "reverse": false
             },
             {
-              "char": "m",
+              "char": "r",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -7051,7 +7051,34 @@
               "reverse": false
             },
             {
-              "char": "h",
+              "char": "p",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "l",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "a",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "y",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -7070,6 +7097,98 @@
             },
             {
               "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": ".",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "t",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "m",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            }
+          ],
+          [
+            {
+              "char": "d",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "m",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -7851,13 +7970,12 @@
           [],
           [],
           [],
-          [],
           []
         ]
       },
       "intermediate_snapshots": [
         {
-          "timestamp": "2026-06-28T05:54:38.894225",
+          "timestamp": "2026-06-28T08:14:32.192070",
           "cursor_position": [
             3,
             53
@@ -9727,18 +9845,18 @@
     {
       "id": "cmd_003",
       "command": "uname -sm",
-      "started_at": "2026-06-28T05:54:39.440180",
-      "finished_at": "2026-06-28T05:54:39.980525",
-      "duration_ms": 540,
+      "started_at": "2026-06-28T08:14:32.747474",
+      "finished_at": "2026-06-28T08:14:33.307649",
+      "duration_ms": 560,
       "exit_code": 0,
       "stdout": "Darwin arm64",
       "stderr": "",
       "combined_output": "Darwin arm64",
       "working_directory": "/Users/dom/work/development/projects/reterm",
       "terminal_before": {
-        "timestamp": "2026-06-28T05:54:39.440151",
+        "timestamp": "2026-06-28T08:14:32.747394",
         "cursor_position": [
-          5,
+          6,
           52
         ],
         "screen_content": [
@@ -9746,9 +9864,9 @@
           "dings for humans and AI\"",
           "reterm: terminal recordings for humans and AI",
           "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples",
-          "demo.json          demo.reterm        hero.reterm        interactive.reterm",
+          "demo.json          hero.reterm        player.reterm",
+          "demo.reterm        interactive.reterm",
           "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗",
-          "",
           "",
           "",
           "",
@@ -9757,7 +9875,7 @@
           "",
           ""
         ],
-        "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          demo.reterm        hero.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗\n\n\n\n\n\n\n\n",
+        "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          hero.reterm        player.reterm\ndemo.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗\n\n\n\n\n\n\n",
         "dimensions": [
           14,
           80
@@ -11852,7 +11970,7 @@
               "reverse": false
             },
             {
-              "char": "d",
+              "char": "h",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -11870,7 +11988,7 @@
               "reverse": false
             },
             {
-              "char": "m",
+              "char": "r",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -12023,7 +12141,34 @@
               "reverse": false
             },
             {
-              "char": "h",
+              "char": "p",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "l",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "a",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "y",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -12042,6 +12187,98 @@
             },
             {
               "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": ".",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "t",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "m",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            }
+          ],
+          [
+            {
+              "char": "d",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "m",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -12817,7 +13054,6 @@
               "reverse": false
             }
           ],
-          [],
           [],
           [],
           [],
@@ -12828,9 +13064,9 @@
         ]
       },
       "terminal_after": {
-        "timestamp": "2026-06-28T05:54:39.980501",
+        "timestamp": "2026-06-28T08:14:33.307614",
         "cursor_position": [
-          7,
+          8,
           52
         ],
         "screen_content": [
@@ -12838,7 +13074,8 @@
           "dings for humans and AI\"",
           "reterm: terminal recordings for humans and AI",
           "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples",
-          "demo.json          demo.reterm        hero.reterm        interactive.reterm",
+          "demo.json          hero.reterm        player.reterm",
+          "demo.reterm        interactive.reterm",
           "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ uname -sm",
           "Darwin arm64",
           "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗",
@@ -12846,10 +13083,9 @@
           "",
           "",
           "",
-          "",
           ""
         ],
-        "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          demo.reterm        hero.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ uname -sm\nDarwin arm64\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗\n\n\n\n\n\n",
+        "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          hero.reterm        player.reterm\ndemo.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ uname -sm\nDarwin arm64\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗\n\n\n\n\n",
         "dimensions": [
           14,
           80
@@ -14944,7 +15180,7 @@
               "reverse": false
             },
             {
-              "char": "d",
+              "char": "h",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -14962,7 +15198,7 @@
               "reverse": false
             },
             {
-              "char": "m",
+              "char": "r",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -15115,7 +15351,34 @@
               "reverse": false
             },
             {
-              "char": "h",
+              "char": "p",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "l",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "a",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "y",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -15134,6 +15397,98 @@
             },
             {
               "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": ".",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "t",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "r",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "m",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            }
+          ],
+          [
+            {
+              "char": "d",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "e",
+              "fg": "default",
+              "bg": "default",
+              "bold": false,
+              "italic": false,
+              "underline": false,
+              "reverse": false
+            },
+            {
+              "char": "m",
               "fg": "default",
               "bg": "default",
               "bold": false,
@@ -16574,15 +16929,14 @@
           [],
           [],
           [],
-          [],
           []
         ]
       },
       "intermediate_snapshots": [
         {
-          "timestamp": "2026-06-28T05:54:39.443473",
+          "timestamp": "2026-06-28T08:14:32.753131",
           "cursor_position": [
-            5,
+            6,
             53
           ],
           "screen_content": [
@@ -16590,9 +16944,9 @@
             "dings for humans and AI\"",
             "reterm: terminal recordings for humans and AI",
             "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples",
-            "demo.json          demo.reterm        hero.reterm        interactive.reterm",
+            "demo.json          hero.reterm        player.reterm",
+            "demo.reterm        interactive.reterm",
             "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ u",
-            "",
             "",
             "",
             "",
@@ -16601,7 +16955,7 @@
             "",
             ""
           ],
-          "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          demo.reterm        hero.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ u\n\n\n\n\n\n\n\n",
+          "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          hero.reterm        player.reterm\ndemo.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ u\n\n\n\n\n\n\n",
           "dimensions": [
             14,
             80
@@ -18696,7 +19050,7 @@
                 "reverse": false
               },
               {
-                "char": "d",
+                "char": "h",
                 "fg": "default",
                 "bg": "default",
                 "bold": false,
@@ -18714,7 +19068,7 @@
                 "reverse": false
               },
               {
-                "char": "m",
+                "char": "r",
                 "fg": "default",
                 "bg": "default",
                 "bold": false,
@@ -18867,7 +19221,34 @@
                 "reverse": false
               },
               {
-                "char": "h",
+                "char": "p",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "l",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "a",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "y",
                 "fg": "default",
                 "bg": "default",
                 "bold": false,
@@ -18886,6 +19267,98 @@
               },
               {
                 "char": "r",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": ".",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "r",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "e",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "t",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "e",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "r",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "m",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              }
+            ],
+            [
+              {
+                "char": "d",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "e",
+                "fg": "default",
+                "bg": "default",
+                "bold": false,
+                "italic": false,
+                "underline": false,
+                "reverse": false
+              },
+              {
+                "char": "m",
                 "fg": "default",
                 "bg": "default",
                 "bold": false,
@@ -19685,7 +20158,6 @@
             [],
             [],
             [],
-            [],
             []
           ]
         }
@@ -19695,7 +20167,7 @@
   "steps": [
     {
       "type": "run",
-      "timestamp": "2026-06-28T05:54:38.890775",
+      "timestamp": "2026-06-28T08:14:32.184341",
       "duration_ms": null,
       "details": {
         "hidden": false
@@ -19703,7 +20175,7 @@
     },
     {
       "type": "run",
-      "timestamp": "2026-06-28T05:54:39.438493",
+      "timestamp": "2026-06-28T08:14:32.743369",
       "duration_ms": null,
       "details": {
         "hidden": false
@@ -19711,7 +20183,7 @@
     },
     {
       "type": "run",
-      "timestamp": "2026-06-28T05:54:39.980557",
+      "timestamp": "2026-06-28T08:14:33.307699",
       "duration_ms": null,
       "details": {
         "hidden": false
@@ -19719,9 +20191,9 @@
     }
   ],
   "final_terminal_state": {
-    "timestamp": "2026-06-28T05:54:39.982098",
+    "timestamp": "2026-06-28T08:14:33.310623",
     "cursor_position": [
-      7,
+      8,
       52
     ],
     "screen_content": [
@@ -19729,7 +20201,8 @@
       "dings for humans and AI\"",
       "reterm: terminal recordings for humans and AI",
       "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples",
-      "demo.json          demo.reterm        hero.reterm        interactive.reterm",
+      "demo.json          hero.reterm        player.reterm",
+      "demo.reterm        interactive.reterm",
       "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ uname -sm",
       "Darwin arm64",
       "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗",
@@ -19737,10 +20210,9 @@
       "",
       "",
       "",
-      "",
       ""
     ],
-    "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          demo.reterm        hero.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ uname -sm\nDarwin arm64\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗\n\n\n\n\n\n",
+    "screen_content_plain": "➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ echo \"reterm: terminal recor\ndings for humans and AI\"\nreterm: terminal recordings for humans and AI\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ ls examples\ndemo.json          hero.reterm        player.reterm\ndemo.reterm        interactive.reterm\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗ uname -sm\nDarwin arm64\n➜  reterm git:(feat/svg-poster-and-hosted-player) ✗\n\n\n\n\n",
     "dimensions": [
       14,
       80
@@ -21835,7 +22307,7 @@
           "reverse": false
         },
         {
-          "char": "d",
+          "char": "h",
           "fg": "default",
           "bg": "default",
           "bold": false,
@@ -21853,7 +22325,7 @@
           "reverse": false
         },
         {
-          "char": "m",
+          "char": "r",
           "fg": "default",
           "bg": "default",
           "bold": false,
@@ -22006,7 +22478,34 @@
           "reverse": false
         },
         {
-          "char": "h",
+          "char": "p",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "l",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "a",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "y",
           "fg": "default",
           "bg": "default",
           "bold": false,
@@ -22025,6 +22524,98 @@
         },
         {
           "char": "r",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": ".",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "r",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "e",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "t",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "e",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "r",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "m",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        }
+      ],
+      [
+        {
+          "char": "d",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "e",
+          "fg": "default",
+          "bg": "default",
+          "bold": false,
+          "italic": false,
+          "underline": false,
+          "reverse": false
+        },
+        {
+          "char": "m",
           "fg": "default",
           "bg": "default",
           "bold": false,
@@ -23465,14 +24056,13 @@
       [],
       [],
       [],
-      [],
       []
     ]
   },
   "errors": [],
   "captured_variables": {},
   "all_commands_text": "echo \"reterm: terminal recordings for humans and AI\"\nls examples\nuname -sm",
-  "all_output_text": "reterm: terminal recordings for humans and AI\ndemo.json          demo.reterm        hero.reterm        interactive.reterm\nDarwin arm64",
+  "all_output_text": "reterm: terminal recordings for humans and AI\ndemo.json          hero.reterm        player.reterm\ndemo.reterm        interactive.reterm\nDarwin arm64",
   "success": true,
   "failed_commands": []
 }
