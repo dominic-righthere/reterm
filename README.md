@@ -258,6 +258,7 @@ claude mcp add reterm -- uv run --directory /path/to/reterm reterm serve
 | `validate_script` | Validate a script without executing it |
 | `format_as_markdown` | Render a log as shareable markdown (commands + output) |
 | `screenshot_terminal` | Return a PNG image of the terminal state |
+| `render_svg` | Return an animated SVG of the session (embeddable inline in a README) |
 
 Resources: `reterm://schema` (JSON log schema), `reterm://themes`, and
 `reterm://example` (an annotated example script).

@@ -19,8 +19,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
   poster linked to it (GitHub can't run a JS player inline, so the poster links out).
 - `reterm play` command to replay a recording in the terminal, with `--speed`
   and `--idle-limit` controls
-- MCP tools `format_as_markdown` (render a log as shareable markdown) and
-  `screenshot_terminal` (return a PNG of the terminal state)
+- MCP tools `format_as_markdown` (render a log as shareable markdown),
+  `screenshot_terminal` (return a PNG of the terminal state), and `render_svg`
+  (return an animated SVG embeddable inline in a README)
 
 ### Changed
 

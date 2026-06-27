@@ -414,6 +414,37 @@ def screenshot_terminal(
     return Image(data=buf.getvalue(), format="png")
 
 
+@mcp.tool
+def render_svg(
+    script_content: str,
+    theme: str = "dracula",
+    shell: str | None = None,
+) -> str:
+    """Run a .reterm script and return an animated SVG of the session.
+
+    The SVG is a self-contained CSS animation that plays inline on GitHub when
+    embedded via ``![demo](demo.svg)`` (GitHub strips JS players, but declarative
+    SVG animation works). Save the returned markup to a ``.svg`` file and embed it
+    in a README — crisp, small, and selectable, unlike a GIF.
+
+    Args:
+        script_content: The .reterm script content in YAML format
+        theme: Terminal color theme (dracula, nord, monokai, etc.)
+        shell: Shell to use (default: $SHELL or /bin/zsh)
+
+    Returns:
+        The animated SVG markup as a string (write it to a .svg file).
+    """
+    try:
+        script = parse_script_string(script_content)
+    except ScriptError as e:
+        raise ValueError(f"Script parse error: {e}") from e
+
+    engine = Engine(shell=shell, theme=theme, generate_gif=True)
+    result = engine.run(script)
+    return result.to_svg_markup(theme)
+
+
 def run_server(transport: str = "stdio", port: int = 8080) -> None:
     """Run the MCP server.
 

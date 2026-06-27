@@ -83,8 +83,8 @@ class RecordingResult:
             writer.add_frame(frame, duration)
         writer.save()
 
-    def save_svg(self, path: Path, theme: str | None = None) -> None:
-        """Save the recording as an animated SVG (flipbook of the styled frames)."""
+    def to_svg_markup(self, theme: str | None = None) -> str:
+        """Render the recording as an animated SVG and return the markup."""
         if not self.styled_frames:
             raise ValueError("No frames to save")
 
@@ -93,12 +93,16 @@ class RecordingResult:
 
         cols, rows = self.log.metadata.terminal_size
         theme_obj = get_theme(theme or self.log.metadata.theme)
-        writer = SvgWriter(path, theme_obj, cols, rows)
+        writer = SvgWriter("<memory>", theme_obj, cols, rows)
         for (styled_lines, cursor_pos), duration in zip(
             self.styled_frames, self.frame_durations
         ):
             writer.add_frame(cells_from_styled_tuples(styled_lines), cursor_pos, duration)
-        writer.save()
+        return writer.to_svg()
+
+    def save_svg(self, path: Path, theme: str | None = None) -> None:
+        """Save the recording as an animated SVG (flipbook of the styled frames)."""
+        Path(path).write_text(self.to_svg_markup(theme))
 
 
 class Engine:
