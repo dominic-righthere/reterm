@@ -7,10 +7,13 @@
 READMEs, blogs, and product pages. One recording produces two outputs: a **GIF**
 for humans and a **structured JSON log** for AI tools and CLIs.
 
-![reterm demo](assets/demo.gif)
+[![reterm demo](assets/demo.svg)](https://dominic-righthere.github.io/reterm/play/?r=demo)
 
+> The SVG above animates inline on GitHub; **click it** for an interactive player
+> (play/pause/seek). See [Embed in your README](#embed-in-your-readme).
+>
 > The Python CLI is not on PyPI yet — install [from source](#install) for now.
-> Once published, the PyPI and CI badges will return here.
+> Once published, the PyPI and CI badges (and the player link) go live.
 
 ## Why reterm
 
@@ -26,14 +29,15 @@ about exactly what ran.
   screen-based capture.)
 - **Two outputs, one record.** A polished GIF and a structured JSON log are
   produced from a single declarative script.
-- **Built for sharing.** Redact secrets and paths before posting, then drop the
-  GIF in a README or play the JSON back interactively with the React player.
+- **Built for sharing.** Redact secrets and paths before posting, then drop an
+  animated SVG/GIF in a README or play the JSON back interactively with the React player.
 
 ## Which output goes where
 
 | Where you're posting | Use | Why |
 |---|---|---|
-| **GitHub README** | **GIF** (`reterm run … -o demo.gif`) | GitHub strips JavaScript, so an animated GIF is the way to show a terminal. |
+| **GitHub README** | **Animated SVG** or **GIF** (`reterm run … -o demo.svg`) | GitHub strips JavaScript, so an animated image is the way to show a terminal inline. SVG is crisp, small, and selectable; GIF works everywhere. |
+| **GitHub README, interactive** | **SVG poster → hosted player** | GitHub can't run a JS player inline, so link the inline poster to a [hosted player](#embed-in-your-readme) for real play/pause/seek. |
 | **Blog / product page** (React/MDX) | **`reterm-player`** + the JSON log | An interactive, seekable replay with real colors and playback controls. |
 | **Feeding an AI tool / CI** | **JSON log** (or the [MCP server](#mcp-server)) | Structured commands, exit codes, and output an agent can read directly. |
 
@@ -98,16 +102,20 @@ uv run reterm play hello.json
 ## CLI Commands
 
 ```bash
-reterm run <script>          # Execute a script → GIF + JSON log
+reterm run <script>          # Execute a script → GIF/SVG + JSON log
 reterm new <file>            # Create a script from a template
 reterm validate <script>     # Validate a script without executing it
 reterm play <log>            # Replay a recording in the terminal
-reterm render <log> -o <gif> # Re-render a GIF from a (possibly redacted) log
+reterm render <log> -o <out> # Re-render a GIF or animated SVG from a log
 reterm redact <log>          # Redact sensitive info from a log
+reterm embed <poster>        # Print Markdown to embed a recording in a README
 reterm serve                 # Start the MCP server for AI tools
 reterm themes                # List available themes
 reterm schema                # Print the JSON log schema
 ```
+
+The visual format is chosen from the `-o` extension: `.gif` or `.svg` (an
+animated SVG you can embed inline in a GitHub README).
 
 `reterm play` supports `--speed` (e.g. `--speed 2`) and `--idle-limit N` to cap
 long pauses.
@@ -131,6 +139,33 @@ reterm redact demo.json -p "sk-[a-zA-Z0-9]+" -r "API_KEY" --regex -o redacted.js
 # Re-render a GIF from the redacted log
 reterm render redacted.json -o redacted.gif
 ```
+
+## Embed in your README
+
+A GitHub README can't run a live JS player — GitHub strips `<script>`/`<iframe>`.
+So the pattern is an **animated SVG poster** (which *does* animate inline, via
+`<img>`) that **links to a hosted interactive player**:
+
+```bash
+# 1. record an animated SVG poster
+reterm run demo.reterm -o assets/demo.svg
+
+# 2. print the Markdown (poster linked to the hosted player)
+reterm embed assets/demo.svg --base https://you.github.io/reterm -r demo
+# → [![terminal recording](assets/demo.svg)](https://you.github.io/reterm/play/?r=demo)
+```
+
+The hosted player is the bundled `reterm-player` deployed as a static page. This
+repo ships a GitHub Pages workflow (`.github/workflows/pages.yml`) that builds it
+and serves `…/play/?r=<name>` (reading `recordings/<name>.json`) and `…/play/?src=<url>`.
+
+> **Enable it once:** repo Settings → Pages → Source: **GitHub Actions**. Pages on
+> a *private* repo needs a public repo or a paid plan; otherwise deploy the same
+> `site/` to Vercel/Netlify and point the poster link there. The inline SVG works
+> regardless of hosting.
+
+Just want the inline animation, no click-through? Use the SVG (or GIF) on its own:
+`![demo](assets/demo.svg)`.
 
 ## React Player
 

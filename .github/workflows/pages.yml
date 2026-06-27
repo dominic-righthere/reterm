@@ -1,0 +1,59 @@
+name: Pages
+
+# Builds the reterm-player into a small static site and deploys it to GitHub
+# Pages, so the README's SVG poster can link to a live interactive player at
+#   https://<owner>.github.io/reterm/play/?r=demo
+#
+# Prerequisite: enable Pages once at Settings -> Pages -> Source: "GitHub Actions".
+# Pages on a private repo needs a paid plan or a public repo; otherwise deploy the
+# same `site/` to any static host (Vercel/Netlify) and point the poster link there.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: packages/player/package-lock.json
+      - run: npm ci
+        working-directory: packages/player
+      - run: npm run build
+        working-directory: packages/player
+      - name: Assemble site
+        run: |
+          mkdir -p site/play site/dist site/recordings
+          cp packages/player/play/index.html site/play/index.html
+          cp -r packages/player/dist/* site/dist/
+          cp packages/player/recordings/*.json site/recordings/
+          printf '<!doctype html><meta http-equiv="refresh" content="0; url=play/">' > site/index.html
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

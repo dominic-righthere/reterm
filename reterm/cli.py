@@ -14,9 +14,9 @@ def cli() -> None:
 
 @cli.command()
 @click.argument("script_file", type=click.Path(exists=True))
-@click.option("--output", "-o", type=click.Path(), help="GIF output path")
+@click.option("--output", "-o", type=click.Path(), help="Visual output path (.gif or .svg)")
 @click.option("--log", "-l", type=click.Path(), help="JSON log output path")
-@click.option("--log-only", is_flag=True, help="Skip GIF generation, output log only")
+@click.option("--log-only", is_flag=True, help="Skip visual output, write the log only")
 @click.option("--theme", "-t", default="dracula", help="Terminal theme")
 @click.option("--shell", default=None, help="Shell to use (default: $SHELL)")
 def run(
@@ -27,7 +27,11 @@ def run(
     theme: str,
     shell: str | None,
 ) -> None:
-    """Execute a .reterm script and generate outputs."""
+    """Execute a .reterm script and generate outputs.
+
+    The visual format is chosen from the -o extension: .gif (default) or .svg
+    (an animated SVG you can embed inline in a GitHub README).
+    """
     from reterm.core.engine import Engine
     from reterm.script.parser import parse_script
     from pathlib import Path
@@ -44,13 +48,21 @@ def run(
     result = engine.run(script)
 
     # Determine output paths
-    gif_path = Path(output) if output else script_path.with_suffix(".gif")
+    out_path = Path(output) if output else script_path.with_suffix(".gif")
     log_path = Path(log) if log else script_path.with_suffix(".json")
 
-    # Write outputs
+    # Write outputs (visual format from the -o extension)
     if not log_only:
-        result.save_gif(gif_path)
-        click.echo(f"GIF saved to: {gif_path}")
+        suffix = out_path.suffix.lower()
+        if suffix == ".svg":
+            result.save_svg(out_path)
+        elif suffix == ".gif":
+            result.save_gif(out_path)
+        else:
+            raise click.ClickException(
+                f"Unsupported output format '{suffix}'. Use .gif or .svg."
+            )
+        click.echo(f"Saved {suffix.lstrip('.').upper()} to: {out_path}")
 
     result.save_log(log_path)
     click.echo(f"Log saved to: {log_path}")
@@ -221,7 +233,7 @@ def play(log_file: str, speed: float, idle_limit: float | None) -> None:
 
 @cli.command()
 @click.argument("log_file", type=click.Path(exists=True))
-@click.option("--output", "-o", required=True, type=click.Path(), help="GIF output path")
+@click.option("--output", "-o", required=True, type=click.Path(), help="Output path (.gif or .svg)")
 @click.option("--theme", "-t", default=None, help="Override theme from log")
 @click.option("--fps", default=30, help="Frames per second")
 def render(
@@ -230,33 +242,76 @@ def render(
     theme: str | None,
     fps: int,
 ) -> None:
-    """Re-render a GIF from a (possibly redacted) log file.
+    """Re-render a GIF or animated SVG from a (possibly redacted) log file.
+
+    The format is chosen from the -o extension.
 
     Examples:
 
-        # Render GIF from log
+        # Render a GIF from a log
         reterm render recording.json -o output.gif
+
+        # Render an animated SVG (embeddable inline in a GitHub README)
+        reterm render recording.json -o output.svg
 
         # Override theme
         reterm render recording.json -o output.gif --theme monokai
     """
     from pathlib import Path
     from reterm.output.models import RecordingLog
-    from reterm.render.from_log import render_gif_from_log
 
     # Load log
     log_path = Path(log_file)
     log = RecordingLog.model_validate_json(log_path.read_text())
 
-    # Render GIF
     output_path = Path(output)
-    render_gif_from_log(
-        log=log,
-        output_path=output_path,
-        theme=theme,
-        fps=fps,
-    )
-    click.echo(f"GIF rendered to: {output_path}")
+    suffix = output_path.suffix.lower()
+    if suffix == ".svg":
+        from reterm.render.svg import render_svg_from_log
+
+        render_svg_from_log(log=log, output_path=output_path, theme=theme, fps=fps)
+        click.echo(f"SVG rendered to: {output_path}")
+    elif suffix == ".gif":
+        from reterm.render.from_log import render_gif_from_log
+
+        render_gif_from_log(log=log, output_path=output_path, theme=theme, fps=fps)
+        click.echo(f"GIF rendered to: {output_path}")
+    else:
+        raise click.ClickException(
+            f"Unsupported output format '{suffix}'. Use .gif or .svg."
+        )
+
+
+@cli.command()
+@click.argument("poster", type=click.Path(), default="assets/demo.svg")
+@click.option("--base", help="Base URL of the hosted player, e.g. https://you.github.io/reterm")
+@click.option("--recording", "-r", "recording", default="demo", help="Recording name under <base>/recordings/<name>.json")
+@click.option("--src", default=None, help="Direct recording URL for the player (?src=...)")
+@click.option("--alt", default="terminal recording", help="Image alt text")
+def embed(poster: str, base: str | None, recording: str, src: str | None, alt: str) -> None:
+    """Print Markdown to embed a recording in a README.
+
+    GitHub READMEs can't run a JS player inline, so this produces an animated-SVG
+    (or GIF) poster that links to the hosted interactive player.
+
+    Examples:
+
+        # Inline animated SVG poster only
+        reterm embed assets/demo.svg
+
+        # SVG poster that links to the hosted player
+        reterm embed assets/demo.svg --base https://you.github.io/reterm -r demo
+    """
+    if base:
+        base_url = base.rstrip("/")
+        target = f"{base_url}/play/?src={src}" if src else f"{base_url}/play/?r={recording}"
+        click.echo(f"[![{alt}]({poster})]({target})")
+    else:
+        click.echo(f"![{alt}]({poster})")
+        click.echo(
+            "tip: pass --base https://<you>.github.io/reterm to link an interactive player",
+            err=True,
+        )
 
 
 if __name__ == "__main__":

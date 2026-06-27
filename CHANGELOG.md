@@ -9,6 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Added
 
+- **Animated SVG output.** `reterm run`/`render` now pick the visual format from
+  the `-o` extension (`.gif` or `.svg`). The SVG is a self-contained CSS flipbook
+  that animates inline on GitHub via `<img>` — crisp, small, and selectable —
+  with the final frame as a static fallback for non-animating viewers.
+- **Hosted interactive player + `reterm embed`.** A GitHub Pages workflow
+  (`.github/workflows/pages.yml`) deploys `reterm-player` as a static page at
+  `…/play/?r=<name>` / `?src=<url>`; `reterm embed` prints the Markdown for an SVG
+  poster linked to it (GitHub can't run a JS player inline, so the poster links out).
 - `reterm play` command to replay a recording in the terminal, with `--speed`
   and `--idle-limit` controls
 - MCP tools `format_as_markdown` (render a log as shareable markdown) and
