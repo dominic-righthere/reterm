@@ -5,6 +5,9 @@ description = "AI-native terminal recording tool with structured output"
 readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
+authors = [
+    { name = "Dominic", email = "dominic.righthere@gmail.com" },
+]
 keywords = ["terminal", "recording", "gif", "mcp", "ai", "cli"]
 classifiers = [
     "Development Status :: 3 - Alpha",
@@ -29,6 +32,11 @@ dependencies = [
     "fastmcp>=2.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/dominic-righthere/reterm"
+Repository = "https://github.com/dominic-righthere/reterm"
+Issues = "https://github.com/dominic-righthere/reterm/issues"
+
 [project.scripts]
 reterm = "reterm.cli:cli"
 
@@ -42,4 +50,13 @@ dev = [
     "pytest-asyncio>=0.23",
     "ruff>=0.1",
     "mypy>=1.0",
+    "types-PyYAML>=6.0",
 ]
+
+[tool.mypy]
+python_version = "3.11"
+
+# ptyprocess ships no type stubs / py.typed marker.
+[[tool.mypy.overrides]]
+module = "ptyprocess.*"
+ignore_missing_imports = true

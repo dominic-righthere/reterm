@@ -4,12 +4,14 @@ export interface WindowFrameProps {
   title?: string;
   theme: Theme;
   children: React.ReactNode;
+  /** When true, window fills container width instead of shrinking to content */
+  fillWidth?: boolean;
 }
 
 /**
  * macOS-style terminal window frame with traffic light buttons.
  */
-export function WindowFrame({ title = 'Terminal', theme, children }: WindowFrameProps) {
+export function WindowFrame({ title = 'Terminal', theme, children, fillWidth = false }: WindowFrameProps) {
   // Use theme's titleBar color or derive from background
   const titleBarBg = (theme as { titleBar?: string }).titleBar || darken(theme.background, 0.1);
   const titleTextColor = (theme as { titleText?: string }).titleText || theme.foreground + '99';
@@ -18,6 +20,8 @@ export function WindowFrame({ title = 'Terminal', theme, children }: WindowFrame
     <div
       className="reterm-window"
       style={{
+        display: fillWidth ? 'block' : 'inline-block',
+        width: fillWidth ? '100%' : undefined,
         borderRadius: '8px',
         overflow: 'hidden',
         boxShadow: '0 4px 16px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05)',

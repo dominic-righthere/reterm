@@ -1,0 +1,20 @@
+meta:
+  name: "reterm"
+  description: "Record terminal sessions accurately — GIF for humans, JSON for AI"
+
+config:
+  shell: /bin/zsh
+  theme: dracula
+  size: [80, 14]
+  typing_speed: 55ms
+
+steps:
+  - type: 'echo "reterm: record terminals for humans and AI"'
+    then: enter
+  - sleep: 700ms
+  - type: 'ls examples'
+    then: enter
+  - sleep: 700ms
+  - type: 'uname -sm && date'
+    then: enter
+  - sleep: 1600ms

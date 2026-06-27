@@ -15,6 +15,8 @@ export interface TerminalProps {
   cursorStyle?: CursorStyle;
   typingText?: string; // Text being typed at cursor position (for animation)
   isTyping?: boolean; // Whether currently in typing animation mode
+  /** When true, terminal fills container width with horizontal scroll */
+  fillWidth?: boolean;
 }
 
 // Pattern detection for common prompts
@@ -42,6 +44,7 @@ export function Terminal({
   cursorStyle = 'block',
   typingText,
   isTyping = false,
+  fillWidth = false,
 }: TerminalProps) {
   const [cols, rows] = dimensions;
   const lineHeight = Math.round(fontSize * 1.4);
@@ -65,11 +68,10 @@ export function Terminal({
     fontFamily,
     fontSize: `${fontSize}px`,
     lineHeight: `${lineHeight}px`,
-    width: `${cols * charWidth + 32}px`,
-    maxWidth: '100%',
+    width: fillWidth ? '100%' : `${cols * charWidth + 32}px`,
     minHeight: `${rows * lineHeight + 24}px`,
     padding: '12px 16px',
-    overflowX: 'auto',
+    overflowX: fillWidth ? 'hidden' : 'auto',  // No scroll in fit mode
     overflowY: 'hidden',
     // Better font rendering
     fontVariantLigatures: 'none',
@@ -91,13 +93,25 @@ export function Terminal({
 
   const styledContent = snapshot.styled_content;
 
+  // Line styles change based on fit mode
+  const lineStyle: React.CSSProperties = fillWidth
+    ? {
+        whiteSpace: 'pre-wrap',      // Allow wrapping in fit mode
+        wordBreak: 'break-all',      // Break long strings
+        minHeight: `${lineHeight}px`, // Minimum height, can grow
+      }
+    : {
+        whiteSpace: 'pre',
+        height: `${lineHeight}px`,
+      };
+
   return (
     <div className="reterm-terminal" style={terminalStyle}>
       {snapshot.screen_content.map((line, rowIndex) => (
         <div
           key={rowIndex}
           className="reterm-line"
-          style={{ whiteSpace: 'pre', height: `${lineHeight}px` }}
+          style={lineStyle}
         >
           {renderLine(
             line,

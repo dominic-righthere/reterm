@@ -5,15 +5,23 @@ Extends pyte with:
 - Proper DEC line drawing charset handling
 """
 
-import copy
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import pyte
 from pyte.screens import Char
 
 from reterm.output.models import StyledChar, TerminalSnapshot
+
+if TYPE_CHECKING:
+    # For type-checking, treat the mixin as a pyte.Screen subclass so the
+    # checker sees cursor/buffer/lines/columns/set_mode/etc. At runtime it bases
+    # on object; the real MRO is Screen(AltScreenMixin, pyte.Screen), so super()
+    # resolves to pyte.Screen regardless.
+    _ScreenBase = pyte.Screen
+else:
+    _ScreenBase = object
 
 
 # Alternate screen private modes (from xterm)
@@ -24,8 +32,13 @@ ALT_SCREEN_MODES = {
 }
 
 
-def _empty_buffer(rows: int, cols: int) -> dict[int, dict[int, Char]]:
-    """Create an empty screen buffer."""
+def _empty_buffer(rows: int, cols: int) -> Any:
+    """Create an empty screen buffer.
+
+    Returns ``Any`` because pyte's ``Screen.buffer`` uses an internal
+    ``StaticDefaultDict`` row type; a plain dict is structurally compatible at
+    runtime but trips the type checker on the alt-screen buffer swap.
+    """
     default_char = Char(" ", "default", "default", False, False, False, False, False)
     return {
         row: {col: default_char for col in range(cols)}
@@ -33,7 +46,7 @@ def _empty_buffer(rows: int, cols: int) -> dict[int, dict[int, Char]]:
     }
 
 
-class AltScreenMixin:
+class AltScreenMixin(_ScreenBase):
     """Mixin that adds alternate screen buffer support to pyte.Screen.
 
     This handles DEC private modes 47, 1047, and 1049 which are used by
@@ -44,7 +57,7 @@ class AltScreenMixin:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         super().__init__(*args, **kwargs)
-        self._alt_buffer: dict[int, dict[int, Char]] | None = None
+        self._alt_buffer: Any = None
         self._alt_cursor: tuple[int, int] | None = None
         self._saved_cursor_main: tuple[int, int] | None = None
         self._on_alt_screen = False

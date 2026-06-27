@@ -1,6 +1,5 @@
 """Terminal frame rendering using Pillow."""
 
-import importlib.resources
 from functools import lru_cache
 from pathlib import Path
 
@@ -20,7 +19,7 @@ def _hex_to_rgb(hex_color: str) -> tuple[int, int, int]:
 
 
 @lru_cache(maxsize=1)
-def _get_default_font(size: int) -> ImageFont.FreeTypeFont:
+def _get_default_font(size: int) -> "ImageFont.FreeTypeFont | ImageFont.ImageFont":
     """Get a monospace font, preferring system fonts."""
     # Try common monospace font paths
     font_paths = [
@@ -102,7 +101,7 @@ class FrameRenderer:
         """Get the size of rendered images."""
         width = self.cols * self.char_width + 2 * self.padding
         height = self.rows * self.char_height + 2 * self.padding
-        return (width, height)
+        return (int(width), int(height))
 
     def render(
         self,

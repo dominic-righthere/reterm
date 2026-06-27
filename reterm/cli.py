@@ -44,19 +44,16 @@ def run(
     result = engine.run(script)
 
     # Determine output paths
-    if output is None and not log_only:
-        output = script_path.with_suffix(".gif")
-    if log is None:
-        log = script_path.with_suffix(".json")
+    gif_path = Path(output) if output else script_path.with_suffix(".gif")
+    log_path = Path(log) if log else script_path.with_suffix(".json")
 
     # Write outputs
-    if not log_only and output:
-        result.save_gif(Path(output))
-        click.echo(f"GIF saved to: {output}")
+    if not log_only:
+        result.save_gif(gif_path)
+        click.echo(f"GIF saved to: {gif_path}")
 
-    if log:
-        result.save_log(Path(log))
-        click.echo(f"Log saved to: {log}")
+    result.save_log(log_path)
+    click.echo(f"Log saved to: {log_path}")
 
 
 @cli.command()
@@ -198,6 +195,28 @@ def redact(
     output_path = Path(output) if output else log_path
     output_path.write_text(redacted_log.model_dump_json(indent=2))
     click.echo(f"Redacted log saved to: {output_path}")
+
+
+@cli.command()
+@click.argument("log_file", type=click.Path(exists=True))
+@click.option("--speed", "-s", default=1.0, help="Playback speed multiplier")
+@click.option("--idle-limit", "-i", default=None, type=float, help="Cap pause duration at N seconds")
+def play(log_file: str, speed: float, idle_limit: float | None) -> None:
+    """Play back a recording in the terminal.
+
+    Examples:
+
+        reterm play recording.json
+        reterm play recording.json --speed 2
+        reterm play recording.json --idle-limit 2
+    """
+    from pathlib import Path
+    from reterm.output.models import RecordingLog
+    from reterm.play import play_recording
+
+    log_path = Path(log_file)
+    log = RecordingLog.model_validate_json(log_path.read_text())
+    play_recording(log, speed=speed, idle_limit=idle_limit)
 
 
 @cli.command()
