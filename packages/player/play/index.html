@@ -60,8 +60,12 @@
         showControls: true,
         fit: true,
         onError: (err) => {
-          document.getElementById('player').innerHTML =
-            `<div class="error">Couldn't load recording from <code>${src}</code><br>${err?.message ?? err}</div>`;
+          // Build with textContent (never innerHTML): `src` and the error come
+          // from the query string / network and must not be parsed as HTML.
+          const div = document.createElement('div');
+          div.className = 'error';
+          div.textContent = `Couldn't load recording from ${src} — ${err?.message ?? err}`;
+          document.getElementById('player').replaceChildren(div);
         },
       })
     );
