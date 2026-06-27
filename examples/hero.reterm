@@ -8,6 +8,10 @@ config:
   size: [80, 14]
   typing_speed: 55ms
 
+# Neutral, plugin-free prompt for a clean public demo (run from the repo root).
+env:
+  ZDOTDIR: examples/demoenv
+
 steps:
   - type: 'echo "reterm: record terminals for humans and AI"'
     then: enter

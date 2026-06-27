@@ -61,6 +61,11 @@ class RecordingResult:
     log: RecordingLog
     frames: list[Image.Image]
     frame_durations: list[int]  # ms per frame
+    # Per-frame styled terminal content (styled_lines, cursor_pos), index-aligned
+    # with frame_durations. Used to render a colored animated SVG.
+    styled_frames: list[tuple[list[list[tuple[str, dict]]], tuple[int, int]]] = field(
+        default_factory=list
+    )
 
     def save_log(self, path: Path) -> None:
         """Save the log to a JSON file."""
@@ -77,6 +82,27 @@ class RecordingResult:
         for frame, duration in zip(self.frames, self.frame_durations):
             writer.add_frame(frame, duration)
         writer.save()
+
+    def to_svg_markup(self, theme: str | None = None) -> str:
+        """Render the recording as an animated SVG and return the markup."""
+        if not self.styled_frames:
+            raise ValueError("No frames to save")
+
+        from reterm.render.svg import SvgWriter, cells_from_styled_tuples
+        from reterm.render.themes import get_theme
+
+        cols, rows = self.log.metadata.terminal_size
+        theme_obj = get_theme(theme or self.log.metadata.theme)
+        writer = SvgWriter("<memory>", theme_obj, cols, rows)
+        for (styled_lines, cursor_pos), duration in zip(
+            self.styled_frames, self.frame_durations
+        ):
+            writer.add_frame(cells_from_styled_tuples(styled_lines), cursor_pos, duration)
+        return writer.to_svg()
+
+    def save_svg(self, path: Path, theme: str | None = None) -> None:
+        """Save the recording as an animated SVG (flipbook of the styled frames)."""
+        Path(path).write_text(self.to_svg_markup(theme))
 
 
 class Engine:
@@ -109,6 +135,7 @@ class Engine:
 
         self.frames: list[Image.Image] = []
         self.frame_durations: list[int] = []
+        self.styled_frames: list[tuple[list[list[tuple[str, dict]]], tuple[int, int]]] = []
 
         self._frame_interval = 1.0 / frame_rate
         self._last_frame_time = 0.0
@@ -206,6 +233,7 @@ class Engine:
             log=log,
             frames=self.frames,
             frame_durations=self.frame_durations,
+            styled_frames=self.styled_frames,
         )
 
     def _execute_step(self, step: Step, index: int) -> None:
@@ -256,6 +284,11 @@ class Engine:
     # hook is appended to preexec so it fires right before output. BEL-terminated
     # (\007) marks are used because pyte ignores them, keeping the GIF clean.
     _ZSH_OSC133_SETUP = (
+        # Disable zsh-autosuggestions for the session: otherwise the grey
+        # history suggestion (e.g. reterm's own setup line, or a prior command)
+        # is drawn on screen and leaks into recorded frames. Recordings should
+        # show only what's typed.
+        "ZSH_AUTOSUGGEST_STRATEGY=() 2>/dev/null; "
         "__rt_pe(){ printf '\\033]133;C\\007' }; "
         "__rt_pc(){ local rc=$?; printf '\\033]133;D;%s\\007' \"$rc\"; "
         "printf '\\033]1337;Cwd=%s\\007' \"$PWD\" }; "
@@ -298,8 +331,25 @@ class Engine:
         saved_cursor_x = self.terminal.screen.cursor.x
         saved_cursor_y = self.terminal.screen.cursor.y
 
-        self.pty.write_line(self._shell_setup_commands())
-        self._read_and_capture(idle_timeout=0.3, max_timeout=5.0)
+        # Append a sentinel and block until it appears in OUTPUT, so ALL of the
+        # (long, multi-line) setup echo is consumed while hidden. Without this
+        # barrier, late-arriving setup bytes can land after we un-hide and leak
+        # the hook definitions into recorded frames.
+        #
+        # The marker uses arithmetic expansion so it appears ONLY in the
+        # command's output, never in the echoed command line: the shell echoes
+        # `echo __RTDONE$((21*2))__` but prints `__RTDONE42__`. Matching the
+        # literal `__RTDONE42__` therefore waits for the command to actually run,
+        # not merely for its echo to render.
+        marker = "__RTDONE42__"
+        self.pty.write_line(f"{self._shell_setup_commands()}; echo __RTDONE$((21*2))__")
+        deadline = time.time() + 5.0
+        while time.time() < deadline:
+            self.pty.read(timeout=0.05)
+            if marker in self.terminal.get_text():
+                break
+        # Drain the prompt redraw that follows the marker (still hidden).
+        self._read_and_capture(idle_timeout=0.2, max_timeout=1.0)
 
         self.terminal.screen.buffer = saved_buffer
         self.terminal.screen.cursor.x = saved_cursor_x
@@ -650,6 +700,8 @@ class Engine:
         # Render frame
         frame = self.renderer.render(styled_lines, cursor_pos)
         self.frames.append(frame)
+        # Keep the styled content too, for rendering a colored animated SVG.
+        self.styled_frames.append((styled_lines, cursor_pos))
 
         # Calculate duration (enforce minimum to avoid 0ms frames)
         if self._last_frame_time > 0:

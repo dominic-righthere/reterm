@@ -1,0 +1,14 @@
+meta:
+  name: "reterm"
+  description: "Record terminal sessions for humans and AI"
+config:
+  shell: /bin/zsh
+  theme: dracula
+  size: [80, 14]
+# Neutral, plugin-free prompt for a clean public demo (run from the repo root).
+env:
+  ZDOTDIR: examples/demoenv
+steps:
+  - run: 'echo "reterm: terminal recordings for humans and AI"'
+  - run: ls examples
+  - run: uname -sm
