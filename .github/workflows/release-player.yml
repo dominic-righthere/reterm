@@ -13,6 +13,9 @@ name: Release player
 #   manual publish is needed — once the publisher is set, pushing a `player-v*`
 #   tag releases the next version. (Trusted Publishing requires the package to
 #   exist, which is only a chicken-and-egg issue for brand-new package names.)
+#   Recommended: in repo Settings -> Environments -> `npm`, add a required
+#   reviewer and restrict deployment to tags `player-v*` so a publish from an
+#   arbitrary tagged ref needs approval.
 #
 # To release: bump the version in packages/player/package.json, then push a tag
 #   `player-v<version>` (e.g. `git tag player-v0.1.2 && git push origin player-v0.1.2`).
@@ -29,6 +32,10 @@ permissions:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    # Gate the privileged (id-token:write) publish behind an environment, so you
+    # can require a manual approval and restrict deployment to `player-v*` tags
+    # (Settings -> Environments -> npm). Parity with release.yml's `pypi` env.
+    environment: npm
     defaults:
       run:
         working-directory: packages/player
@@ -39,6 +46,8 @@ jobs:
           node-version: 20
           registry-url: "https://registry.npmjs.org"
       # Trusted Publishing (OIDC) needs npm >= 11.5.1; Node 20 ships npm 10.x.
-      - run: npm install -g npm@latest
+      # Pin the version (not @latest) so a token-minting job never pulls an
+      # arbitrary npm release.
+      - run: npm install -g npm@11.5.1
       - run: npm ci
       - run: npm publish --provenance --access public
