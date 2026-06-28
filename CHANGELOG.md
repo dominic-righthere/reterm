@@ -25,6 +25,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Changed
 
+- **Viewer-friendly timing.** `reterm run`/`render` now cap how long any single
+  static frame is held in the GIF/SVG (`--idle-limit`, default 2s; `0` = real
+  timing), so long `sleep:` steps and idle stretches don't bake dead air into
+  the loop. And in visual output, `run` commands now animate their keystrokes —
+  matching the React player — while `--log-only`/MCP runs stay instant.
 - **Per-command capture now uses OSC 133 shell-integration marks.** reterm
   injects invisible `preexec`/`precmd` hooks into the recording shell (zsh, and
   bash ≥ 4.4) that delimit each command's output and report its exit code — the

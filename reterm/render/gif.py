@@ -15,10 +15,12 @@ class GIFWriter:
         output_path: Path | str,
         fps: int = 30,
         loop: int = 0,  # 0 = infinite loop
+        max_frame_ms: int | None = None,  # cap any single frame's hold time
     ) -> None:
         self.output_path = Path(output_path)
         self.fps = fps
         self.loop = loop
+        self.max_frame_ms = max_frame_ms
         self.frames: list[Image.Image] = []
         self.frame_durations: list[int] = []  # ms per frame
 
@@ -31,6 +33,12 @@ class GIFWriter:
         """
         self.frames.append(frame)
         self.frame_durations.append(duration_ms or int(1000 / self.fps))
+
+    def _cap(self, durations: list[int]) -> list[int]:
+        """Clamp each (already-deduped) frame's hold time to max_frame_ms."""
+        if self.max_frame_ms is None:
+            return durations
+        return [min(d, self.max_frame_ms) for d in durations]
 
     def save(self) -> None:
         """Write GIF to disk."""
@@ -45,7 +53,7 @@ class GIFWriter:
             self.output_path,
             arrays,
             extension=".gif",
-            duration=self.frame_durations,
+            duration=self._cap(self.frame_durations),
             loop=self.loop,
         )
 
@@ -72,14 +80,14 @@ class GIFWriter:
                     optimized_frames.append(frame)
                     optimized_durations.append(self.frame_durations[i])
 
-        # Save optimized version
+        # Save optimized version (cap dead air after dedup accumulation)
         arrays = [np.array(f) for f in optimized_frames]
 
         iio.imwrite(
             self.output_path,
             arrays,
             extension=".gif",
-            duration=optimized_durations,
+            duration=self._cap(optimized_durations),
             loop=self.loop,
         )
 

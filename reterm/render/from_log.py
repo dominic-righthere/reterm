@@ -13,6 +13,7 @@ def render_gif_from_log(
     output_path: Path,
     theme: str | None = None,
     fps: int = 30,
+    idle_limit: float | None = None,
 ) -> None:
     """Render a GIF from an existing recording log.
 
@@ -37,7 +38,8 @@ def render_gif_from_log(
     )
 
     # Create GIF writer
-    writer = GIFWriter(output_path, fps=fps)
+    max_frame_ms = int(idle_limit * 1000) if idle_limit and idle_limit > 0 else None
+    writer = GIFWriter(output_path, fps=fps, max_frame_ms=max_frame_ms)
 
     # Render frames from terminal snapshots
     for cmd in log.commands:
