@@ -9,8 +9,10 @@ name: Release player
 # One-time setup (you):
 #   On npmjs.com → reterm-player → Settings → Trusted Publisher, add a GitHub
 #   Actions publisher: repository `dominic-righthere/reterm`, workflow
-#   `release-player.yml`. (The package must exist first — do the initial
-#   `npm publish` manually, then trusted publishing handles subsequent releases.)
+#   `release-player.yml`. reterm-player already exists on npm (0.1.0), so no
+#   manual publish is needed — once the publisher is set, pushing a `player-v*`
+#   tag releases the next version. (Trusted Publishing requires the package to
+#   exist, which is only a chicken-and-egg issue for brand-new package names.)
 #
 # To release: bump the version in packages/player/package.json, then push a tag
 #   `player-v<version>` (e.g. `git tag player-v0.1.2 && git push origin player-v0.1.2`).
