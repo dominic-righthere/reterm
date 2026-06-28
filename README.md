@@ -159,10 +159,12 @@ The hosted player is the bundled `reterm-player` deployed as a static page. This
 repo ships a GitHub Pages workflow (`.github/workflows/pages.yml`) that builds it
 and serves `…/play/?r=<name>` (reading `recordings/<name>.json`) and `…/play/?src=<url>`.
 
-> **Enable it once:** repo Settings → Pages → Source: **GitHub Actions**. Pages on
-> a *private* repo needs a public repo or a paid plan; otherwise deploy the same
-> `site/` to Vercel/Netlify and point the poster link there. The inline SVG works
-> regardless of hosting.
+> **Turn it on once** (the workflow is gated off by default so `main` stays green):
+> set a repo variable `ENABLE_PAGES=true` (`gh variable set ENABLE_PAGES --body true`,
+> or Settings → Secrets and variables → Actions → Variables). The next run
+> auto-enables Pages and deploys. Pages needs a **public repo or a paid plan**;
+> otherwise deploy the same `site/` to Vercel/Netlify and point the poster link
+> there. The inline SVG works regardless of hosting.
 
 Just want the inline animation, no click-through? Use the SVG (or GIF) on its own:
 `![demo](assets/demo.svg)`.
