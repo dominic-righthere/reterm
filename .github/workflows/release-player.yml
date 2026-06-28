@@ -1,0 +1,42 @@
+name: Release player
+
+# Publishes reterm-player to npm via OIDC Trusted Publishing — no NPM token.
+#
+# Triggered only by a `player-v*` tag (no workflow_dispatch), so the privileged
+# id-token:write job can't be run from an arbitrary ref. Actions are pinned to
+# commit SHAs.
+#
+# One-time setup (you):
+#   On npmjs.com → reterm-player → Settings → Trusted Publisher, add a GitHub
+#   Actions publisher: repository `dominic-righthere/reterm`, workflow
+#   `release-player.yml`. (The package must exist first — do the initial
+#   `npm publish` manually, then trusted publishing handles subsequent releases.)
+#
+# To release: bump the version in packages/player/package.json, then push a tag
+#   `player-v<version>` (e.g. `git tag player-v0.1.2 && git push origin player-v0.1.2`).
+
+on:
+  push:
+    tags:
+      - "player-v*"
+
+permissions:
+  contents: read
+  id-token: write # OIDC for npm Trusted Publishing + provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/player
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: 20
+          registry-url: "https://registry.npmjs.org"
+      # Trusted Publishing (OIDC) needs npm >= 11.5.1; Node 20 ships npm 10.x.
+      - run: npm install -g npm@latest
+      - run: npm ci
+      - run: npm publish --provenance --access public
