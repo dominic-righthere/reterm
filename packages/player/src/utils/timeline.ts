@@ -112,8 +112,14 @@ export function buildTimeline(recording: RecordingLog | null, typingSpeed: numbe
       currentTime += typingDuration + 100; // + pause before result
     }
 
-    // Add intermediate snapshots if available (progressive output)
-    const intermediateSnapshots = cmd.intermediate_snapshots || [];
+    // Add intermediate snapshots if available (progressive output).
+    // Skip pre-output frames that only show the command being echoed (a prefix
+    // of the full command): the typing animation already shows the command
+    // appearing, so these would make it flash back to a partial word (e.g.
+    // `echo`, `ls`, `uname`) right before the output.
+    const showsFullCommand = (s: TerminalSnapshot) =>
+      !cmd.command || s.screen_content.join('\n').includes(cmd.command);
+    const intermediateSnapshots = (cmd.intermediate_snapshots || []).filter(showsFullCommand);
     if (intermediateSnapshots.length > 0 && cmd.terminal_after) {
       // Calculate duration for each intermediate snapshot
       const totalDuration = cmd.duration_ms || 500;
