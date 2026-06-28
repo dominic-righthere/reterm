@@ -1,5 +1,7 @@
 # reterm
 
+[![CI](https://github.com/dominic-righthere/reterm/actions/workflows/ci.yml/badge.svg)](https://github.com/dominic-righthere/reterm/actions/workflows/ci.yml)
+[![PyPI](https://img.shields.io/pypi/v/reterm)](https://pypi.org/project/reterm/)
 [![npm](https://img.shields.io/npm/v/reterm-player)](https://www.npmjs.com/package/reterm-player)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -11,9 +13,6 @@ for humans and a **structured JSON log** for AI tools and CLIs.
 
 > The SVG above animates inline on GitHub; **click it** for an interactive player
 > (play/pause/seek). See [Embed in your README](#embed-in-your-readme).
->
-> The Python CLI is not on PyPI yet — install [from source](#install) for now.
-> Once published, the PyPI and CI badges (and the player link) go live.
 
 ## Why reterm
 
@@ -49,17 +48,20 @@ about exactly what ran.
 **Python CLI** (requires Python 3.11+, [uv](https://docs.astral.sh/uv/)):
 
 ```bash
-git clone https://github.com/dominic-righthere/reterm.git
-cd reterm
-uv sync
-uv run reterm --help
-
-# optional: install as a global `reterm` command
-uv tool install .
+uv tool install reterm     # global `reterm` command
+# or run without installing:
+uvx reterm --help
 ```
 
-> PyPI publishing is planned — once live, `uv tool install reterm` and
-> `uvx reterm` will work directly.
+<details><summary>From source</summary>
+
+```bash
+git clone https://github.com/dominic-righthere/reterm.git
+cd reterm
+uv sync && uv run reterm --help
+```
+
+</details>
 
 **React player** (published on npm):
 
@@ -89,14 +91,14 @@ steps:
 Run it:
 
 ```bash
-# Generate GIF + JSON log (use `reterm …` directly if you ran `uv tool install .`)
-uv run reterm run hello.reterm -o hello.gif -l hello.json
+# Generate GIF + JSON log
+reterm run hello.reterm -o hello.gif -l hello.json
 
 # JSON log only, no GIF (faster — ideal for AI/CLI use)
-uv run reterm run hello.reterm --log-only -l hello.json
+reterm run hello.reterm --log-only -l hello.json
 
 # Replay a recording in your terminal
-uv run reterm play hello.json
+reterm play hello.json
 ```
 
 ## CLI Commands
@@ -228,13 +230,13 @@ import 'reterm-player/style.css';
 
 Expose reterm to AI tools over the [Model Context Protocol](https://modelcontextprotocol.io).
 
-**Claude Code** (from source — replace the path with your clone):
+**Claude Code:**
 
 ```bash
-claude mcp add reterm -- uv run --directory /path/to/reterm reterm serve
+claude mcp add reterm -- uvx reterm serve
 
 # Available across all projects:
-# claude mcp add --scope user reterm -- uv run --directory /path/to/reterm reterm serve
+# claude mcp add --scope user reterm -- uvx reterm serve
 ```
 
 **Claude Desktop** (`~/Library/Application Support/Claude/claude_desktop_config.json`):
@@ -243,14 +245,13 @@ claude mcp add reterm -- uv run --directory /path/to/reterm reterm serve
 {
   "mcpServers": {
     "reterm": {
-      "command": "uv",
-      "args": ["run", "--directory", "/path/to/reterm", "reterm", "serve"]
+      "command": "uvx",
+      "args": ["reterm", "serve"]
     }
   }
 }
 ```
 
-> Once reterm is on PyPI, the command simplifies to `uvx reterm serve`.
 > SSE transport is also available via `reterm serve --transport sse`.
 
 ### Tools & resources
