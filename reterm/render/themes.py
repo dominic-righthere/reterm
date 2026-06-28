@@ -91,6 +91,12 @@ class Theme:
             if color.startswith("#"):
                 return color
 
+            # Bare 6-digit hex: pyte resolves 256-color *and* 24-bit truecolor to
+            # "rrggbb" (no leading '#'). Must come before the int() check below so
+            # an all-digit hex like "008000" isn't misread as a color index.
+            if len(color) == 6 and all(c in "0123456789abcdefABCDEF" for c in color):
+                return f"#{color}"
+
             # Handle numeric ANSI codes
             try:
                 index = int(color)

@@ -5,12 +5,13 @@ Extends pyte with:
 - Proper DEC line drawing charset handling
 """
 
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 import pyte
-from pyte.screens import Char
+from pyte.screens import StaticDefaultDict
 
 from reterm.output.models import StyledChar, TerminalSnapshot
 
@@ -30,20 +31,6 @@ ALT_SCREEN_MODES = {
     1047,  # Use Alternate Screen Buffer (xterm)
     1049,  # Save cursor + Use Alternate Screen Buffer (most common)
 }
-
-
-def _empty_buffer(rows: int, cols: int) -> Any:
-    """Create an empty screen buffer.
-
-    Returns ``Any`` because pyte's ``Screen.buffer`` uses an internal
-    ``StaticDefaultDict`` row type; a plain dict is structurally compatible at
-    runtime but trips the type checker on the alt-screen buffer swap.
-    """
-    default_char = Char(" ", "default", "default", False, False, False, False, False)
-    return {
-        row: {col: default_char for col in range(cols)}
-        for row in range(rows)
-    }
 
 
 class AltScreenMixin(_ScreenBase):
@@ -105,9 +92,13 @@ class AltScreenMixin(_ScreenBase):
         if save_cursor:
             self._saved_cursor_main = (self.cursor.y, self.cursor.x)
 
-        # Save main buffer, switch to alternate
+        # Save main buffer, switch to a blank alternate buffer. Mirror pyte's
+        # main buffer (a defaultdict whose rows auto-create default-char cells):
+        # a plain dict here caused KeyError crashes when an app on the alternate
+        # screen (e.g. nvim with `laststatus=2`) erased/drew on a row that wasn't
+        # pre-populated.
         self._alt_buffer = self.buffer
-        self.buffer = _empty_buffer(self.lines, self.columns)
+        self.buffer = defaultdict(lambda: StaticDefaultDict(self.default_char))
 
         # Reset cursor to top-left on alternate screen
         self.cursor.y = 0

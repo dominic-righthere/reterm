@@ -42,6 +42,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ### Fixed
 
+- **TUI / full-color recording (issue #9).** Several fixes for recording
+  full-screen apps like Neovim:
+  - **24-bit truecolor and 256-color now render.** pyte resolves both to bare
+    `rrggbb` hex; `Theme.resolve_color` only recognized `#`-prefixed hex, so they
+    (and explicit `ctermbg`/gui backgrounds) fell back to the default color. It
+    now accepts bare 6-digit hex — fixing truecolor, 256-color, and bg fills in
+    the GIF/SVG (the React player already handled bare hex).
+  - **No more pyte `KeyError` crash on the alternate screen.** The alt-screen
+    buffer was a plain dict, so an erase/draw on an unpopulated row (e.g. nvim
+    with `laststatus=2`) crashed mid-recording. It's now a `defaultdict` like
+    pyte's main buffer. (This also unblocks capture of late-frame content such as
+    right-aligned virtual text, which the crash was cutting off.)
+  - **TUI column wobble fixed efficiently.** SVG glyphs are pinned to their grid
+    column with a per-character `x` list, but only for runs with non-ASCII glyphs
+    (box-drawing, CJK); plain ASCII keeps a single `x`, so normal shell
+    recordings don't grow ~2.5x. (Refines #10.)
 - **Accurate exit codes.** The shell-state probe expanded `$__rc___` / `$PWD___`
   as the (undefined) variables `__rc___` / `PWD___`, so every command recorded
   `exit_code: -1` and `success` was always wrong. Now uses `${__rc}` / `${PWD}`.

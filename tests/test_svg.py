@@ -92,6 +92,39 @@ class TestGifIdleCap:
         assert "&lt;" in svg and "&amp;" in svg and "&gt;" in svg
 
 
+class TestColorResolve:
+    def test_bare_hex_256_and_truecolor(self):
+        # pyte resolves 256-color and 24-bit truecolor to bare "rrggbb" (no '#').
+        assert DRACULA.resolve_color("00c864", is_foreground=True) == "#00c864"
+        assert DRACULA.resolve_color("0087ff", is_foreground=True) == "#0087ff"
+        assert DRACULA.resolve_color("ff0000", is_foreground=False) == "#ff0000"
+        # all-digit hex must not be misread as a color index
+        assert DRACULA.resolve_color("008000", is_foreground=True) == "#008000"
+
+    def test_named_hash_index_default_unchanged(self):
+        assert DRACULA.resolve_color("blue", is_foreground=True) == DRACULA.blue
+        assert DRACULA.resolve_color("#abcdef", is_foreground=True) == "#abcdef"
+        assert DRACULA.resolve_color("7", is_foreground=True) == DRACULA.white  # ANSI index
+        assert DRACULA.resolve_color("default", is_foreground=True) == DRACULA.foreground
+
+
+class TestConditionalGridPinning:
+    def _x_attrs(self, svg: str) -> list[str]:
+        return re.findall(r'<tspan x="([^"]+)"', svg)
+
+    def test_ascii_run_uses_single_x(self):
+        w = SvgWriter("o.svg", DRACULA, cols=10, rows=1)
+        w.add_frame([[_Cell("a"), _Cell("b"), _Cell("c")]], None, 100)
+        # plain ASCII → one x value (kept small), no per-char list
+        assert all(" " not in x for x in self._x_attrs(w.to_svg()))
+
+    def test_non_ascii_run_pins_each_glyph(self):
+        w = SvgWriter("o.svg", DRACULA, cols=10, rows=1)
+        w.add_frame([[_Cell("┌"), _Cell("─"), _Cell("┐")]], None, 100)
+        # box-drawing → per-char x list (space-separated)
+        assert any(" " in x for x in self._x_attrs(w.to_svg()))
+
+
 class TestCellConverters:
     def test_from_styled_tuples(self):
         rows = cells_from_styled_tuples(
