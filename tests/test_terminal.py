@@ -125,3 +125,14 @@ class TestScreenClass:
 
         screen.reset_mode(1049, private=True)
         assert not screen.on_alt_screen
+
+    def test_alt_buffer_is_defaultdict_no_keyerror(self):
+        """Alt screen (used by nvim) must auto-create rows like pyte's main
+        buffer, or erase/draw on an unpopulated row raises KeyError mid-record."""
+        from collections import defaultdict
+
+        t = Terminal(TerminalConfig(rows=4, cols=10))
+        t.feed("\x1b[?1049h")  # enter alternate screen
+        assert isinstance(t.screen.buffer, defaultdict)
+        # erase_in_line / erase_in_display on rows not pre-populated must not crash
+        t.feed("\x1b[40;1H\x1b[2K\x1b[2J")
