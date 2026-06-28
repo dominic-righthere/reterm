@@ -19,6 +19,13 @@ def cli() -> None:
 @click.option("--log-only", is_flag=True, help="Skip visual output, write the log only")
 @click.option("--theme", "-t", default="dracula", help="Terminal theme")
 @click.option("--shell", default=None, help="Shell to use (default: $SHELL)")
+@click.option(
+    "--idle-limit",
+    "-i",
+    default=2.0,
+    type=float,
+    help="Cap any static frame at N seconds in the GIF/SVG so long waits don't drag (0 = uncapped)",
+)
 def run(
     script_file: str,
     output: str | None,
@@ -26,6 +33,7 @@ def run(
     log_only: bool,
     theme: str,
     shell: str | None,
+    idle_limit: float,
 ) -> None:
     """Execute a .reterm script and generate outputs.
 
@@ -55,9 +63,9 @@ def run(
     if not log_only:
         suffix = out_path.suffix.lower()
         if suffix == ".svg":
-            result.save_svg(out_path)
+            result.save_svg(out_path, idle_limit=idle_limit)
         elif suffix == ".gif":
-            result.save_gif(out_path)
+            result.save_gif(out_path, idle_limit=idle_limit)
         else:
             raise click.ClickException(
                 f"Unsupported output format '{suffix}'. Use .gif or .svg."
@@ -236,11 +244,19 @@ def play(log_file: str, speed: float, idle_limit: float | None) -> None:
 @click.option("--output", "-o", required=True, type=click.Path(), help="Output path (.gif or .svg)")
 @click.option("--theme", "-t", default=None, help="Override theme from log")
 @click.option("--fps", default=30, help="Frames per second")
+@click.option(
+    "--idle-limit",
+    "-i",
+    default=2.0,
+    type=float,
+    help="Cap any static frame at N seconds so long waits don't drag (0 = uncapped)",
+)
 def render(
     log_file: str,
     output: str,
     theme: str | None,
     fps: int,
+    idle_limit: float,
 ) -> None:
     """Re-render a GIF or animated SVG from a (possibly redacted) log file.
 
@@ -269,12 +285,16 @@ def render(
     if suffix == ".svg":
         from reterm.render.svg import render_svg_from_log
 
-        render_svg_from_log(log=log, output_path=output_path, theme=theme, fps=fps)
+        render_svg_from_log(
+            log=log, output_path=output_path, theme=theme, fps=fps, idle_limit=idle_limit
+        )
         click.echo(f"SVG rendered to: {output_path}")
     elif suffix == ".gif":
         from reterm.render.from_log import render_gif_from_log
 
-        render_gif_from_log(log=log, output_path=output_path, theme=theme, fps=fps)
+        render_gif_from_log(
+            log=log, output_path=output_path, theme=theme, fps=fps, idle_limit=idle_limit
+        )
         click.echo(f"GIF rendered to: {output_path}")
     else:
         raise click.ClickException(

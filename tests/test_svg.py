@@ -65,6 +65,26 @@ class TestSvgWriter:
         with pytest.raises(ValueError):
             _writer().to_svg()
 
+    def test_idle_cap_clamps_accumulated_static_hold(self):
+        # A long static stretch is captured as many identical frames that merge;
+        # the cap clamps the accumulated hold so dead air doesn't drag the loop.
+        capped = SvgWriter("o.svg", DRACULA, cols=4, rows=1, max_frame_ms=2000)
+        uncapped = SvgWriter("o.svg", DRACULA, cols=4, rows=1)
+        for _ in range(50):  # 50 * 100ms = 5000ms of identical frames
+            capped.add_frame([[_Cell("a")]], (0, 1), 100)
+            uncapped.add_frame([[_Cell("a")]], (0, 1), 100)
+        assert capped.frame_count() == 1 and uncapped.frame_count() == 1
+        assert capped._frames[0][2] == 2000  # clamped
+        assert uncapped._frames[0][2] == 5000  # full
+
+
+class TestGifIdleCap:
+    def test_cap_clamps_durations(self):
+        from reterm.render.gif import GIFWriter
+
+        assert GIFWriter("x.gif", max_frame_ms=2000)._cap([100, 5000, 1500]) == [100, 2000, 1500]
+        assert GIFWriter("x.gif")._cap([5000]) == [5000]  # no cap -> unchanged
+
     def test_xml_escaping(self):
         w = _writer()
         w.add_frame([[_Cell("<"), _Cell("&"), _Cell(">")]], None, 100)

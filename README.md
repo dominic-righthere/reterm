@@ -115,7 +115,10 @@ reterm schema                # Print the JSON log schema
 ```
 
 The visual format is chosen from the `-o` extension: `.gif` or `.svg` (an
-animated SVG you can embed inline in a GitHub README).
+animated SVG you can embed inline in a GitHub README). In visual output, `run`
+commands animate their keystrokes (like the player); `--log-only`/MCP runs stay
+instant. `run`/`render` take `--idle-limit N` (default `2`, `0` = off) to cap how
+long any static frame is held, so long pauses don't drag the loop.
 
 `reterm play` supports `--speed` (e.g. `--speed 2`) and `--idle-limit N` to cap
 long pauses.

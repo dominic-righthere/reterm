@@ -6,7 +6,7 @@ config:
   shell: /bin/zsh
   theme: dracula
   size: [80, 14]
-  typing_speed: 55ms
+  typing_speed: 38ms
 
 # Neutral, plugin-free prompt for a clean public demo (run from the repo root).
 env:
@@ -15,10 +15,10 @@ env:
 steps:
   - type: 'echo "reterm: record terminals for humans and AI"'
     then: enter
-  - sleep: 700ms
+  - sleep: 350ms
   - type: 'ls examples'
     then: enter
-  - sleep: 700ms
+  - sleep: 350ms
   - type: 'uname -sm && date'
     then: enter
-  - sleep: 1600ms
+  - sleep: 1000ms

@@ -71,19 +71,26 @@ class RecordingResult:
         """Save the log to a JSON file."""
         path.write_text(self.log.model_dump_json(indent=2))
 
-    def save_gif(self, path: Path) -> None:
-        """Save frames as an animated GIF."""
+    def save_gif(self, path: Path, idle_limit: float | None = None) -> None:
+        """Save frames as an animated GIF.
+
+        ``idle_limit`` (seconds) caps how long any single static frame is held,
+        so long command waits / sleeps don't bake dead air into the loop.
+        """
         if not self.frames:
             raise ValueError("No frames to save")
 
         from reterm.render.gif import GIFWriter
 
-        writer = GIFWriter(path)
+        max_frame_ms = int(idle_limit * 1000) if idle_limit and idle_limit > 0 else None
+        writer = GIFWriter(path, max_frame_ms=max_frame_ms)
         for frame, duration in zip(self.frames, self.frame_durations):
             writer.add_frame(frame, duration)
-        writer.save()
+        # save_optimized dedups consecutive identical frames, so the idle cap
+        # applies to the accumulated hold time (not each ~33ms capture).
+        writer.save_optimized()
 
-    def to_svg_markup(self, theme: str | None = None) -> str:
+    def to_svg_markup(self, theme: str | None = None, idle_limit: float | None = None) -> str:
         """Render the recording as an animated SVG and return the markup."""
         if not self.styled_frames:
             raise ValueError("No frames to save")
@@ -93,16 +100,19 @@ class RecordingResult:
 
         cols, rows = self.log.metadata.terminal_size
         theme_obj = get_theme(theme or self.log.metadata.theme)
-        writer = SvgWriter("<memory>", theme_obj, cols, rows)
+        max_frame_ms = int(idle_limit * 1000) if idle_limit and idle_limit > 0 else None
+        writer = SvgWriter("<memory>", theme_obj, cols, rows, max_frame_ms=max_frame_ms)
         for (styled_lines, cursor_pos), duration in zip(
             self.styled_frames, self.frame_durations
         ):
             writer.add_frame(cells_from_styled_tuples(styled_lines), cursor_pos, duration)
         return writer.to_svg()
 
-    def save_svg(self, path: Path, theme: str | None = None) -> None:
+    def save_svg(
+        self, path: Path, theme: str | None = None, idle_limit: float | None = None
+    ) -> None:
         """Save the recording as an animated SVG (flipbook of the styled frames)."""
-        Path(path).write_text(self.to_svg_markup(theme))
+        Path(path).write_text(self.to_svg_markup(theme, idle_limit))
 
 
 class Engine:
@@ -367,8 +377,21 @@ class Engine:
         terminal_before = self.terminal.snapshot()
         started_at = datetime.now()
 
-        # Type the command (no animation for run)
-        self.pty.write_line(command)
+        # Enter the command. When producing a visual (GIF/SVG), animate the
+        # keystrokes so it reads like the React player's typed playback; for
+        # headless/log-only runs (no frames captured), send it instantly so
+        # structured execution stays fast. The typed echo lands before the
+        # OSC 133 `C` mark, so it never pollutes the captured output.
+        if self.config.generate_gif:
+            for ch in command:
+                self.pty.write(ch)
+                self._read_and_capture(
+                    idle_timeout=self.config.typing_speed,
+                    max_timeout=max(self.config.typing_speed * 3, 0.2),
+                )
+            self.pty.send_key("enter")
+        else:
+            self.pty.write_line(command)
 
         # Wait for output, capturing frames, intermediate snapshots, and the raw
         # PTY byte stream (so we can slice exact output from OSC 133 marks).

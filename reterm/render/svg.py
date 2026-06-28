@@ -94,6 +94,7 @@ class SvgWriter:
         font_size: int = 14,
         padding: int = 16,
         loop: bool = True,
+        max_frame_ms: int | None = None,  # cap any single frame's hold time
     ) -> None:
         self.output_path = Path(output_path)
         self.theme = theme
@@ -104,6 +105,7 @@ class SvgWriter:
         self.char_h = font_size * 1.2
         self.padding = padding
         self.loop = loop
+        self.max_frame_ms = max_frame_ms
         # (rows_of_cells, cursor_pos, duration_ms)
         self._frames: list[tuple[list[list[_Cell]], tuple[int, int] | None, int]] = []
 
@@ -126,10 +128,15 @@ class SvgWriter:
     ) -> None:
         """Append a frame, merging it into the previous one if identical."""
         duration_ms = max(int(duration_ms), 1)
+        if self.max_frame_ms is not None:
+            duration_ms = min(duration_ms, self.max_frame_ms)
         if self._frames:
             prev_rows, prev_cursor, prev_dur = self._frames[-1]
             if prev_cursor == cursor_pos and self._rows_key(prev_rows) == self._rows_key(rows):
-                self._frames[-1] = (prev_rows, prev_cursor, prev_dur + duration_ms)
+                merged = prev_dur + duration_ms
+                if self.max_frame_ms is not None:
+                    merged = min(merged, self.max_frame_ms)
+                self._frames[-1] = (prev_rows, prev_cursor, merged)
                 return
         self._frames.append((rows, cursor_pos, duration_ms))
 
@@ -272,6 +279,7 @@ def render_svg_from_log(
     output_path: Path,
     theme: str | None = None,
     fps: int = 30,
+    idle_limit: float | None = None,
 ) -> None:
     """Render an animated SVG from an existing recording log.
 
@@ -285,7 +293,8 @@ def render_svg_from_log(
 
     cols, rows = log.metadata.terminal_size
     theme_obj = get_theme(theme or log.metadata.theme)
-    writer = SvgWriter(output_path, theme_obj, cols, rows)
+    max_frame_ms = int(idle_limit * 1000) if idle_limit and idle_limit > 0 else None
+    writer = SvgWriter(output_path, theme_obj, cols, rows, max_frame_ms=max_frame_ms)
 
     def add_snapshot(snapshot: Any, duration_ms: int) -> None:
         if snapshot.styled_content:
