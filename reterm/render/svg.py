@@ -202,8 +202,14 @@ class SvgWriter:
             for start, text, fg, bg, bold, underline in runs:
                 if not text.strip() and bg is None:
                     continue
-                x = self.padding + start * self.char_w
-                attrs = f' x="{x:.2f}" fill="{fg}"'
+                # Pin every glyph to its exact grid column (x is a per-char list)
+                # so alignment never depends on the font's glyph advance width.
+                # Without this, multi-char runs (e.g. a "|---+---|" rule row) drift
+                # when the font advance != char_w and columns wobble.
+                xs = " ".join(
+                    f"{self.padding + (start + i) * self.char_w:.2f}" for i in range(len(text))
+                )
+                attrs = f' x="{xs}" fill="{fg}"'
                 if bold:
                     attrs += ' font-weight="bold"'
                 if underline:
