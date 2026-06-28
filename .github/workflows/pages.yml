@@ -24,6 +24,12 @@ concurrency:
 
 jobs:
   build:
+    # Only deploy when the ENABLE_PAGES repo variable is "true". Set it once the
+    # repo is public / Pages is enabled (Settings → Secrets and variables →
+    # Actions → Variables, or `gh variable set ENABLE_PAGES --body true`). Until
+    # then this job is skipped, so pushes to main stay green instead of failing
+    # on "Pages not enabled" (which can't be enabled on a private/free repo).
+    if: vars.ENABLE_PAGES == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,6 +50,8 @@ jobs:
           cp packages/player/recordings/*.json site/recordings/
           printf '<!doctype html><meta http-equiv="refresh" content="0; url=play/">' > site/index.html
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true  # auto-enable Pages (Actions source) on first run
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
