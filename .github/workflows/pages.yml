@@ -49,6 +49,10 @@ jobs:
           cp -r packages/player/dist/* site/dist/
           cp packages/player/recordings/*.json site/recordings/
           printf '<!doctype html><meta http-equiv="refresh" content="0; url=play/">' > site/index.html
+          # Cache-bust the player assets per deploy so browsers never serve a
+          # stale dist/index.js after a fix (the page itself revalidates within
+          # the Pages max-age, then picks up the new ?v= query).
+          sed -i "s|\.\./dist/index\.js|../dist/index.js?v=${GITHUB_SHA}|g; s|\.\./dist/style\.css|../dist/style.css?v=${GITHUB_SHA}|g" site/play/index.html
       - uses: actions/configure-pages@v5
         with:
           enablement: true  # auto-enable Pages (Actions source) on first run
