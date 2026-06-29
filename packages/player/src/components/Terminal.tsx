@@ -69,10 +69,13 @@ export function Terminal({
     fontSize: `${fontSize}px`,
     lineHeight: `${lineHeight}px`,
     width: fillWidth ? '100%' : `${cols * charWidth + 32}px`,
-    minHeight: `${rows * lineHeight + 24}px`,
+    // Fixed height (= the recording's rows) so the player never grows/shrinks
+    // with content and reflows the surrounding page. Overflow scrolls inside the
+    // box like a real terminal instead.
+    height: `${rows * lineHeight + 24}px`,
     padding: '12px 16px',
-    overflowX: fillWidth ? 'hidden' : 'auto',  // No scroll in fit mode
-    overflowY: 'hidden',
+    overflowX: 'auto',  // wide lines scroll horizontally (no wrap)
+    overflowY: 'auto',  // taller content scrolls vertically (no page reflow)
     // Better font rendering
     fontVariantLigatures: 'none',
     fontFeatureSettings: '"liga" 0, "calt" 0',
@@ -93,17 +96,13 @@ export function Terminal({
 
   const styledContent = snapshot.styled_content;
 
-  // Line styles change based on fit mode
-  const lineStyle: React.CSSProperties = fillWidth
-    ? {
-        whiteSpace: 'pre-wrap',      // Allow wrapping in fit mode
-        wordBreak: 'break-all',      // Break long strings
-        minHeight: `${lineHeight}px`, // Minimum height, can grow
-      }
-    : {
-        whiteSpace: 'pre',
-        height: `${lineHeight}px`,
-      };
+  // Never wrap: a terminal line is exactly one grid row. Wrapping made the
+  // player grow vertically (and reflow the page) as long output appeared. Wide
+  // lines scroll horizontally instead (overflowX on the container).
+  const lineStyle: React.CSSProperties = {
+    whiteSpace: 'pre',
+    height: `${lineHeight}px`,
+  };
 
   return (
     <div className="reterm-terminal" style={terminalStyle}>

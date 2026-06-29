@@ -99,6 +99,14 @@ export function usePlayback(
     let animationId: number;
 
     const animate = (timestamp: number) => {
+      // Duration not resolved yet (timeline still settling on load). Without this
+      // guard `currentTime >= totalDuration` is `0 >= 0`, so the loop branch keeps
+      // resetting startTime every frame and playback is pinned at 0:00.
+      if (state.totalDuration <= 0) {
+        animationId = requestAnimationFrame(animate);
+        return;
+      }
+
       if (startTimeRef.current === null) {
         startTimeRef.current = timestamp - pausedAtRef.current;
       }

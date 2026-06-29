@@ -1,6 +1,6 @@
 {
   "name": "reterm-player",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "React component for replaying terminal recordings from reterm JSON logs",
   "type": "module",
   "main": "./dist/index.cjs",
